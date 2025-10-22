@@ -1,0 +1,44 @@
+{
+  "name": "tcds-io/php-jackson-laravel",
+  "description": "A Laravel plugin to inject and respond serializable objects in controllers",
+  "type": "library",
+  "license": "MIT",
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=8.4",
+    "ext-json": "*",
+    "tcds-io/php-jackson": "dev-main"
+  },
+  "require-dev": {
+    "symfony/var-dumper": "^6.0",
+    "phpstan/phpstan": "^2.1",
+    "phpunit/phpunit": "^12.3",
+    "php-cs-fixer/shim": "^3.88"
+  },
+  "autoload": {
+    "psr-4": {
+      "Tcds\\Io\\Serializer\\Laravel\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Test\\Tcds\\Io\\Serializer\\Laravel\\": "tests/"
+    }
+  },
+  "scripts": {
+    "cs:check": "vendor/bin/php-cs-fixer check -v ./",
+    "cs:fix": "vendor/bin/php-cs-fixer fix ./",
+    "test:stan": "vendor/bin/phpstan analyse src --level=max --ansi",
+    "test:unit": "vendor/bin/phpunit --testdox --color=always",
+    "tests": [
+      "@cs:check",
+      "@test:stan",
+      "@test:unit"
+    ]
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": false
+    }
+  }
+}
