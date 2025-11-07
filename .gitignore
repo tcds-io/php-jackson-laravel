@@ -5,3 +5,4 @@ out/
 .phpunit.result.cache
 .php-cs-fixer.cache
 package.xml
+tests/blog

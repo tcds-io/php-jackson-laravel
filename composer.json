@@ -7,17 +7,18 @@
   "require": {
     "php": ">=8.4",
     "ext-json": "*",
-    "tcds-io/php-jackson": "dev-main"
+    "tcds-io/php-jackson": "dev-main",
+    "laravel/framework": "^12.0.0"
   },
   "require-dev": {
-    "symfony/var-dumper": "^6.0",
+    "symfony/var-dumper": "^7.0",
     "phpstan/phpstan": "^2.1",
     "phpunit/phpunit": "^12.3",
     "php-cs-fixer/shim": "^3.88"
   },
   "autoload": {
     "psr-4": {
-      "Tcds\\Io\\Serializer\\Laravel\\": "src/"
+      "Tcds\\Io\\Laravel\\Jackson\\": "src/"
     }
   },
   "autoload-dev": {
