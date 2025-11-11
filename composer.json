@@ -41,5 +41,12 @@
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": false
     }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Tcds\\Io\\Laravel\\Jackson\\Providers\\JacksonObjectMapperProvider"
+      ]
+    }
   }
 }

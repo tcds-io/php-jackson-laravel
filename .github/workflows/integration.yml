@@ -21,5 +21,8 @@ jobs:
       - name: Setup testing application
         run: tests/install.sh
 
+      - name: Setup testing application
+        run: tests/install.sh
+
       - name: Run tests
         run: cd tests/blog ; php artisan test
