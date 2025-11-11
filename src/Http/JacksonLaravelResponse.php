@@ -1,10 +1,10 @@
 <?php
 
-namespace Tcds\Io\Laravel\Jackson\Http;
+namespace Tcds\Io\Jackson\Laravel\Http;
 
 use Illuminate\Http\JsonResponse;
 
-class JacksonResponse extends JsonResponse
+class JacksonLaravelResponse extends JsonResponse
 {
     public function __construct(
         public readonly mixed $serializable,

@@ -18,12 +18,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Tcds\\Io\\Laravel\\Jackson\\": "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Test\\Tcds\\Io\\Serializer\\Laravel\\": "tests/"
+      "Tcds\\Io\\Jackson\\Laravel\\": "src/"
     }
   },
   "scripts": {
@@ -45,7 +40,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "Tcds\\Io\\Laravel\\Jackson\\Providers\\JacksonObjectMapperProvider"
+        "Tcds\\Io\\Jackson\\Laravel\\Providers\\JacksonLaravelObjectMapperProvider"
       ]
     }
   }

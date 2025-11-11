@@ -1,12 +1,12 @@
 <?php
 
-namespace Tcds\Io\Laravel\Jackson\Http\Dispatchers;
+namespace Tcds\Io\Jackson\Laravel\Http\Dispatchers;
 
 use Illuminate\Http\JsonResponse;
+use Tcds\Io\Jackson\Laravel\Http\JacksonLaravelResponse;
 use Tcds\Io\Jackson\ObjectMapper;
-use Tcds\Io\Laravel\Jackson\Http\JacksonResponse;
 
-readonly class JacksonResponseWrapper
+readonly class JacksonLaravelResponseWrapper
 {
     public function __construct(private ObjectMapper $mapper)
     {
@@ -14,7 +14,7 @@ readonly class JacksonResponseWrapper
 
     public function respond($response)
     {
-        if ($response instanceof JacksonResponse) {
+        if ($response instanceof JacksonLaravelResponse) {
             return new JsonResponse(
                 data: $this->mapper->writeValue($response->serializable),
                 status: $response->getStatusCode(),

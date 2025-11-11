@@ -1,21 +1,52 @@
 <?php
 
-namespace Tcds\Io\Laravel\Jackson\Http;
+namespace Tcds\Io\Jackson\Laravel\Http;
 
+use Illuminate\Config\Repository as Config;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Route;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Tcds\Io\Generic\Reflection\Type\Parser\TypeParser;
+use Tcds\Io\Generic\Reflection\Type\ReflectionType;
 use Tcds\Io\Jackson\Exception\JacksonException;
 use Tcds\Io\Jackson\Exception\UnableToParseValue;
 use Tcds\Io\Jackson\ObjectMapper;
 
-readonly class JacksonRequestParser
+readonly class JacksonLaravelRouteParamResolver
 {
-    public function __construct(private ObjectMapper $mapper, private Request $request)
+    /** @var array<string, array> */
+    private array $config;
+
+    public function __construct(
+        private ObjectMapper $mapper,
+        private Request $request,
+        Config $config,
+    ) {
+        $this->config = $config->get('serializer.classes', []);
+    }
+
+    public function resolve(string $name, string $type, Route $route): void
     {
+        [$main, $generics] = TypeParser::getGenericTypes($type);
+        $listType = $generics[0] ?? 'mixed';
+
+        $serializableType = match (true) {
+            isset($this->config[$main]) => $main,
+            ReflectionType::isList($main) && isset($this->config[$listType]) => $type,
+            // shape
+            default => null,
+        };
+
+        if (is_null($serializableType)) {
+            return;
+        }
+
+        $value = $this->parseType($serializableType);
+        $route->setParameter($name, $value);
     }
 
     /**
@@ -25,7 +56,7 @@ readonly class JacksonRequestParser
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function parseRequest(string $class): object
+    private function parseType(string $class): mixed
     {
         try {
             return $this->decodeRequest($class);
