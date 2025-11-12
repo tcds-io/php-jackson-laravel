@@ -26,9 +26,10 @@ class JacksonLaravelControllerDispatcher extends ControllerDispatcher
 
     public function dispatch(Route $route, $controller, $method)
     {
-        collect(new ReflectionClass($controller::class)
-            ->getMethod($method)
-            ->getParameters())
+        $function = new ReflectionClass($controller::class)->getMethod($method);
+        $returnType = $function->getReturnType()->getName();
+
+        collect($function->getParameters())
             ->each(fn(ReflectionParameter $parameter) => $this->parser->resolve(
                 $parameter->getName(),
                 $parameter->getType()->getName(),
@@ -37,6 +38,6 @@ class JacksonLaravelControllerDispatcher extends ControllerDispatcher
 
         $response = parent::dispatch($route, $controller, $method);
 
-        return $this->wrapper->respond($response);
+        return $this->wrapper->respond($response, $returnType);
     }
 }

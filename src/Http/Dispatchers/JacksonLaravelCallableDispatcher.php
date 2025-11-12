@@ -7,6 +7,7 @@ use Illuminate\Routing\CallableDispatcher;
 use Illuminate\Routing\Route;
 use ReflectionFunction;
 use ReflectionParameter;
+use Tcds\Io\Generic\Reflection\Type\Parser\OriginalTypeParser;
 use Tcds\Io\Jackson\Laravel\Http\JacksonLaravelRouteParamResolver;
 use Throwable;
 
@@ -26,8 +27,12 @@ class JacksonLaravelCallableDispatcher extends CallableDispatcher
 
     public function dispatch(Route $route, $callable)
     {
-        collect(new ReflectionFunction($callable)
-            ->getParameters())
+        $function = new ReflectionFunction($callable);
+
+        /**
+         * TODO: replace by better-generics reflection
+         */
+        collect($function->getParameters())
             ->each(fn(ReflectionParameter $parameter) => $this->resolver->resolve(
                 $parameter->getName(),
                 $parameter->getType()->getName(),
@@ -36,6 +41,14 @@ class JacksonLaravelCallableDispatcher extends CallableDispatcher
 
         $response = parent::dispatch($route, $callable);
 
-        return $this->wrapper->respond($response);
+        /**
+         * TODO: replace by better-generics type guessing
+         */
+        $returnType = match (true) {
+            is_object($response) => $response::class,
+            default => OriginalTypeParser::parse($function->getReturnType()),
+        };
+
+        return $this->wrapper->respond($response, $returnType);
     }
 }
