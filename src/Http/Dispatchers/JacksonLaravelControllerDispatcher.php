@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Routing\ControllerDispatcher;
 use Illuminate\Routing\Route;
 use Tcds\Io\Generic\Reflection\ReflectionClass;
+use Tcds\Io\Generic\Reflection\ReflectionMethodParameter;
 use Tcds\Io\Generic\Reflection\ReflectionParameter;
 use Tcds\Io\Jackson\Laravel\Http\JacksonLaravelRouteParamResolver;
 use Throwable;
@@ -30,7 +31,7 @@ class JacksonLaravelControllerDispatcher extends ControllerDispatcher
         $returnType = $function->getReturnType()->getName();
 
         collect($function->getParameters())
-            ->each(fn(ReflectionParameter $parameter) => $this->parser->resolve(
+            ->each(fn(ReflectionMethodParameter $parameter) => $this->parser->resolve(
                 $parameter->getName(),
                 $parameter->getType()->getName(),
                 $route,

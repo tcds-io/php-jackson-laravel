@@ -24,7 +24,8 @@ readonly class JacksonLaravelResponseWrapper
     public function respond(mixed $response, string $returnType): mixed
     {
         [$type, $generics] = TypeParser::getGenericTypes($returnType);
-        $listType = $generics[0] ?? 'mixed';
+        $type = $type === 'mixed' && is_object($response) ? $response::class : $type;
+        $listType = ReflectionType::isList($type) ? $generics[0] ?? 'mixed' : 'mixed';
 
         return match (true) {
             $response instanceof JacksonLaravelResponse => new JsonResponse(

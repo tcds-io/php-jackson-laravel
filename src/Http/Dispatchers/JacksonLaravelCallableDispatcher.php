@@ -5,9 +5,8 @@ namespace Tcds\Io\Jackson\Laravel\Http\Dispatchers;
 use Illuminate\Container\Container;
 use Illuminate\Routing\CallableDispatcher;
 use Illuminate\Routing\Route;
-use ReflectionFunction;
-use ReflectionParameter;
-use Tcds\Io\Generic\Reflection\Type\Parser\OriginalTypeParser;
+use Tcds\Io\Generic\Reflection\ReflectionFunction;
+use Tcds\Io\Generic\Reflection\ReflectionFunctionParameter;
 use Tcds\Io\Jackson\Laravel\Http\JacksonLaravelRouteParamResolver;
 use Throwable;
 
@@ -28,12 +27,10 @@ class JacksonLaravelCallableDispatcher extends CallableDispatcher
     public function dispatch(Route $route, $callable)
     {
         $function = new ReflectionFunction($callable);
+        $params = $function->getParameters();
 
-        /**
-         * TODO: replace by better-generics reflection
-         */
-        collect($function->getParameters())
-            ->each(fn(ReflectionParameter $parameter) => $this->resolver->resolve(
+        collect($params)
+            ->each(fn(ReflectionFunctionParameter $parameter) => $this->resolver->resolve(
                 $parameter->getName(),
                 $parameter->getType()->getName(),
                 $route,
@@ -41,13 +38,7 @@ class JacksonLaravelCallableDispatcher extends CallableDispatcher
 
         $response = parent::dispatch($route, $callable);
 
-        /**
-         * TODO: replace by better-generics type guessing
-         */
-        $returnType = match (true) {
-            is_object($response) => $response::class,
-            default => OriginalTypeParser::parse($function->getReturnType()),
-        };
+        $returnType = $function->getReturnType()->getName();
 
         return $this->wrapper->respond($response, $returnType);
     }
