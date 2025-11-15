@@ -7,12 +7,12 @@ use App\Models\Foo;
 class FooBarController
 {
     /**
-     * @param list<Foo> $foos
+     * @param list<Foo> $items
      * @return list<Foo>
      */
-    public function list(array $foos): array
+    public function list(array $items): array
     {
-        return $foos;
+        return $items;
     }
 
     public function read(int $id, Foo $foo): Foo

@@ -1,70 +1,25 @@
 <?php
 
-namespace Tests\Feature;
+namespace Feature;
 
 use App\Http\Controllers\FooBarController;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class HttpSerializationTest extends TestCase
+class ControllerSerializationTest extends TestCase
 {
-    /**
-     * @see routes/web.php
-     */
-    public function testSerializeGetResponse(): void
+    #[Test]
+    public function controller_post_inject_param(): void
     {
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
-        $this->assertJsonStringEqualsJsonString(
-            <<<JSON
-            {
-              "id": 1,
-              "a": "aaa",
-              "b": "get",
-              "type": "AAA"
-            }
-            JSON,
-            $response->content(),
-        );
-    }
-
-    /**
-     * @see routes/web.php
-     */
-    public function testSerializeObjectInjectingCallable(): void
-    {
-        $response = $this->post('/', [
-            'a' => 'aaa',
-            'b' => 'post',
-            'type' => 'BBB',
-        ]);
-
-        $response->assertStatus(200);
-        $this->assertJsonStringEqualsJsonString(
-            <<<JSON
-            {
-              "id": null,
-              "a": "aaa",
-              "b": "post",
-              "type": "BBB"
-            }
-            JSON,
-            $response->content(),
-        );
-    }
-
-    /**
-     * @see FooBarController::read
-     */
-    public function testSerializeObjectInjectingController(): void
-    {
+        /**
+         * @see FooBarController::read
+         */
         $response = $this->post('/controller/10', [
             'a' => 'something',
             'b' => 'something else',
             'type' => 'AAA',
         ]);
 
-        $response->assertStatus(200);
         $this->assertJsonStringEqualsJsonString(
             <<<JSON
             {
@@ -76,20 +31,21 @@ class HttpSerializationTest extends TestCase
             JSON,
             $response->content(),
         );
+        $response->assertStatus(200);
     }
 
-    /**
-     * @see FooBarController::read
-     */
-    public function testWhenPayloadIsInvalidThenThrowBadRequest(): void
+    #[Test]
+    public function controller_invalid_inject_param(): void
     {
+        /**
+         * @see FooBarController::read
+         */
         $response = $this->post('/controller/10', [
             'a' => 'something',
             'b' => 'something else',
             'type' => 'YYY',
         ]);
 
-        $response->assertStatus(400);
         $this->assertJsonStringEqualsJsonString(
             <<<JSON
             {
@@ -100,13 +56,15 @@ class HttpSerializationTest extends TestCase
             JSON,
             $response->content(),
         );
+        $response->assertStatus(400);
     }
 
-    /**
-     * @see FooBarController::list
-     */
-    public function testGivenAListThenReturnList(): void
+    #[Test]
+    public function controller_post_list_return_list(): void
     {
+        /**
+         * @see FooBarController::list
+         */
         $response = $this->post('/controller', [
             [
                 'id' => 10,
@@ -122,7 +80,6 @@ class HttpSerializationTest extends TestCase
             ],
         ]);
 
-        $response->assertStatus(200);
         $this->assertJsonStringEqualsJsonString(
             <<<JSON
             [
@@ -142,5 +99,6 @@ class HttpSerializationTest extends TestCase
             JSON,
             $response->content(),
         );
+        $response->assertStatus(200);
     }
 }

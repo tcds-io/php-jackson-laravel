@@ -13,7 +13,8 @@ cp tests/fixtures/web.php $WORKDIR/routes/
 cp tests/fixtures/Foo.php $WORKDIR/app/Models/
 cp tests/fixtures/Type.php $WORKDIR/app/Models/
 cp tests/fixtures/FooBarController.php $WORKDIR/app/Http/Controllers/
-cp tests/fixtures/HttpSerializationTest.php $WORKDIR/tests/Feature/
+cp tests/fixtures/CallableSerializationTest.php $WORKDIR/tests/Feature/
+cp tests/fixtures/ControllerSerializationTest.php $WORKDIR/tests/Feature/
 cp tests/fixtures/serializer.php $WORKDIR/config/
 
 composer config \

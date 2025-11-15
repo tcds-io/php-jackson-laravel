@@ -5,13 +5,18 @@ use App\Models\Foo;
 use App\Models\Type;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return new Foo(id: 1, a: "aaa", b: "get", type: Type::AAA);
-});
+Route::get('/', fn() => response()->json(['foo' => 'bar']));
+Route::get('/callable/resource/{id}', fn(int $id) => new Foo(id: $id, a: "aaa", b: "get", type: Type::AAA));
+Route::post('/callable/resource', fn(Foo $foo) => $foo);
 
-Route::post('/', function (Foo $foo) {
-    return $foo;
-});
+Route::post('/callable',
+    /**
+     * @param list<Foo> $items
+     * @return list<Foo>
+     */
+    fn(array $items): array => $items,
+);
 
 Route::post('/controller', [FooBarController::class, 'list']);
 Route::post('/controller/{id}', [FooBarController::class, 'read']);
+Route::post('/controller/resource', [FooBarController::class, 'resource']);
