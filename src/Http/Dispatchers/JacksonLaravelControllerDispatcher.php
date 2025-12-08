@@ -5,40 +5,22 @@ namespace Tcds\Io\Jackson\Laravel\Http\Dispatchers;
 use Illuminate\Container\Container;
 use Illuminate\Routing\ControllerDispatcher;
 use Illuminate\Routing\Route;
+use Override;
 use Tcds\Io\Generic\Reflection\ReflectionClass;
-use Tcds\Io\Generic\Reflection\ReflectionMethodParameter;
-use Tcds\Io\Generic\Reflection\ReflectionParameter;
-use Tcds\Io\Jackson\Laravel\Http\JacksonLaravelRouteParamResolver;
-use Throwable;
+use Tcds\Io\Jackson\Laravel\Http\JacksonLaravelRequestDispatcher;
 
 class JacksonLaravelControllerDispatcher extends ControllerDispatcher
 {
-    private JacksonLaravelResponseWrapper $wrapper;
-
-    /**
-     * @throws Throwable
-     */
-    public function __construct(Container $container, private readonly JacksonLaravelRouteParamResolver $parser)
+    public function __construct(Container $container, private readonly JacksonLaravelRequestDispatcher $dispatcher)
     {
         parent::__construct($container);
-
-        $this->wrapper = $container->get(JacksonLaravelResponseWrapper::class);
     }
 
+    #[Override]
     public function dispatch(Route $route, $controller, $method)
     {
         $function = new ReflectionClass($controller::class)->getMethod($method);
-        $returnType = $function->getReturnType()->getName();
 
-        collect($function->getParameters())
-            ->each(fn(ReflectionMethodParameter $parameter) => $this->parser->resolve(
-                $parameter->getName(),
-                $parameter->getType()->getName(),
-                $route,
-            ));
-
-        $response = parent::dispatch($route, $controller, $method);
-
-        return $this->wrapper->respond($response, $returnType);
+        return $this->dispatcher->dispatch($function, [$controller, $method]);
     }
 }
