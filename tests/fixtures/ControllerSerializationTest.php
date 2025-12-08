@@ -1,6 +1,6 @@
 <?php
 
-namespace Feature;
+namespace Tests\Feature;
 
 use App\Http\Controllers\FooBarController;
 use PHPUnit\Framework\Attributes\Test;
@@ -96,6 +96,26 @@ class ControllerSerializationTest extends TestCase
                   "type": "BBB"
                 }
             ]
+            JSON,
+            $response->content(),
+        );
+        $response->assertStatus(200);
+    }
+
+    #[Test]
+    public function custom_params(): void
+    {
+        /**
+         * @see FooBarController::invoices
+         */
+        $response = $this->post('/controller/invoices?customer=Tcds.Io');
+
+        $this->assertJsonStringEqualsJsonString(
+            <<<JSON
+            {
+              "userId": 150,
+              "customer": "Tcds.Io"
+            }
             JSON,
             $response->content(),
         );

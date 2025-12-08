@@ -18,5 +18,6 @@ Route::post('/callable',
 );
 
 Route::post('/controller', [FooBarController::class, 'list']);
-Route::post('/controller/{id}', [FooBarController::class, 'read']);
 Route::post('/controller/resource', [FooBarController::class, 'resource']);
+Route::post('/controller/invoices', [FooBarController::class, 'invoices']);
+Route::post('/controller/{id}', [FooBarController::class, 'read']);

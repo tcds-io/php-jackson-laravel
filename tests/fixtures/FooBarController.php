@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Foo;
+use App\Queries\InvoiceQuery;
 
 class FooBarController
 {
@@ -23,5 +24,10 @@ class FooBarController
             b: $foo->b,
             type: $foo->type,
         );
+    }
+
+    public function invoices(InvoiceQuery $query): InvoiceQuery
+    {
+        return $query;
     }
 }

@@ -35,9 +35,10 @@ readonly class JacksonLaravelRequestDispatcher
         Config $config,
     ) {
         $this->config = $config->get('serializer.classes', []);
+        $customParams = $config->get('serializer.params', fn(ObjectMapper $mapper) => []);
 
         $this->data = array_merge(
-            $config->get('serializer.params', []),
+            $customParams($this->mapper),
             $this->request->query->all(),
             $this->request->request->all(),
             $this->request->route()->parameters,
