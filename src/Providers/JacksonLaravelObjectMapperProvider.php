@@ -9,7 +9,7 @@ use Tcds\Io\Jackson\ArrayObjectMapper;
 use Tcds\Io\Jackson\JsonObjectMapper;
 use Tcds\Io\Jackson\Laravel\Http\Dispatchers\JacksonLaravelCallableDispatcher;
 use Tcds\Io\Jackson\Laravel\Http\Dispatchers\JacksonLaravelControllerDispatcher;
-use Tcds\Io\Jackson\Laravel\Http\JacksonLaravelRequestDispatcher;
+use Tcds\Io\Jackson\Laravel\Http\Dispatchers\JacksonLaravelResponseWrapper;
 use Tcds\Io\Jackson\ObjectMapper;
 
 class JacksonLaravelObjectMapperProvider extends ServiceProvider
@@ -28,8 +28,13 @@ class JacksonLaravelObjectMapperProvider extends ServiceProvider
         $this->app->singleton(ArrayObjectMapper::class, fn() => $arrayMapper);
         $this->app->singleton(JsonObjectMapper::class, fn() => new JsonObjectMapper(typeMappers: $classes));
         $this->app->singleton(ObjectMapper::class, fn() => $arrayMapper);
+
         $this->app->singleton(CallableDispatcher::class, JacksonLaravelCallableDispatcher::class);
         $this->app->singleton(ControllerDispatcher::class, JacksonLaravelControllerDispatcher::class);
-        $this->app->singleton(JacksonLaravelRequestDispatcher::class, JacksonLaravelRequestDispatcher::class);
+
+        $this->app->singleton(JacksonLaravelResponseWrapper::class, fn() => new JacksonLaravelResponseWrapper(
+            mapper: $arrayMapper,
+            classes: $classes,
+        ));
     }
 }
