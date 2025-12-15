@@ -63,7 +63,7 @@ readonly class JacksonLaravelRequestDispatcher
             ])
             ->map(fn(string $type, string $name) => $this->resolveParamByNameAndType($name, $type))
             ->filter(fn($value) => !is_null($value))
-            ->toArray();
+            ->all();
     }
 
     public function resolveParamByNameAndType(string $name, string $type): mixed
