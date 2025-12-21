@@ -48,9 +48,10 @@ readonly class JacksonLaravelRequestDispatcher
     public function dispatch(ReflectionMethod|ReflectionFunction $function, callable $callable): mixed
     {
         $returnType = $function->getReturnType()->getName();
-        $params = $this->resolveParams($function->getParameters());
+        $params = $function->getParameters();
+        $resolved = $this->resolveParams($params);
 
-        $response = call_user_func($callable, ...$params);
+        $response = call_user_func($callable, ...$resolved);
 
         return $this->wrapper->respond($response, $returnType);
     }
@@ -58,16 +59,18 @@ readonly class JacksonLaravelRequestDispatcher
     private function resolveParams(array $params): array
     {
         return collect($params)
-            ->mapWithKeys(fn(ReflectionFunctionParameter|ReflectionMethodParameter $param) => [
-                $param->name => $param->getType()->getName(),
-            ])
-            ->map(fn(string $type, string $name) => $this->resolveParamByNameAndType($name, $type))
+            ->mapWithKeys($this->resolveParamValue(...))
             ->filter(fn($value) => !is_null($value))
             ->all();
     }
 
-    public function resolveParamByNameAndType(string $name, string $type): mixed
+    /**
+     * @return array<string, mixed>
+     */
+    public function resolveParamValue(ReflectionFunctionParameter|ReflectionMethodParameter $param): array
     {
+        $name = $param->name;
+        $type = $param->getType()->getName();
         [$main, $generics] = TypeParser::getGenericTypes($type);
         $isList = ReflectionType::isList($main);
 
@@ -75,12 +78,18 @@ readonly class JacksonLaravelRequestDispatcher
             $main = $generics[0] ?? 'mixed';
         }
 
-        return match (true) {
+        if ($param->isVariadic()) {
+            return $this->request->route()->parameters;
+        }
+
+        $value = match (true) {
             $this->isSerializable($main) => $this->parseSerializableType($type, $isList),
             $this->container->has($type) => $this->container->get($type),
             array_key_exists($name, $this->data) => $this->data[$name],
             default => throw new JacksonException("Cannot resolve `$name` from request"),
         };
+
+        return [$name => $value];
     }
 
     private function isSerializable(string $type): bool
