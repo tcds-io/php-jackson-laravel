@@ -3,14 +3,23 @@
 namespace Tcds\Io\Jackson\Laravel\Http;
 
 use Illuminate\Http\JsonResponse;
+use Tcds\Io\Jackson\ObjectMapper;
 
-class JacksonLaravelResponse extends JsonResponse
+readonly class JacksonLaravelResponse
 {
     public function __construct(
-        public readonly mixed $serializable,
-        $status = 200,
-        $headers = [],
+        private mixed $serializable,
+        private int $status = 200,
+        private array $headers = [],
     ) {
-        parent::__construct($serializable, $status, $headers);
+    }
+
+    public function toJsonResponse(ObjectMapper $mapper): JsonResponse
+    {
+        return new JsonResponse(
+            data: $mapper->writeValue($this->serializable),
+            status: $this->status,
+            headers: $this->headers,
+        );
     }
 }
