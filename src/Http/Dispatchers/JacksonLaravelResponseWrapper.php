@@ -2,10 +2,8 @@
 
 namespace Tcds\Io\Jackson\Laravel\Http\Dispatchers;
 
-use Symfony\Component\HttpFoundation\Response;
 use Tcds\Io\Generic\Reflection\Type\Parser\TypeParser;
 use Tcds\Io\Generic\Reflection\Type\ReflectionType;
-use Tcds\Io\Jackson\Exception\JacksonException;
 use Tcds\Io\Jackson\Laravel\Http\JacksonLaravelResponse;
 use Tcds\Io\Jackson\ObjectMapper;
 
@@ -19,10 +17,9 @@ readonly class JacksonLaravelResponseWrapper
     {
         return match (true) {
             $returnType === 'void' => null,
-            $response instanceof Response => $response,
             $response instanceof JacksonLaravelResponse => $response->toJsonResponse($this->mapper),
             $this->isSerializable($response, $returnType) => $this->mapper->writeValue($response),
-            default => throw new JacksonException("Missing serializer for endpoint response type <$returnType>."),
+            default => $response,
         };
     }
 
