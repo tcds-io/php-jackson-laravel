@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Models\UserSettings;
 use App\Services\AuthTokenService;
 use Tcds\Io\Jackson\ObjectMapper;
 
 /**
  * @returns array{
- *     classes: array<class-string, array{
+ *     mappers: array<class-string, array{
  *         reader?: callable(mixed $value, string $type, ObjectMapper $mapper, array $path): mixed,
  *         writer?: callable(mixed $data, string $type, ObjectMapper $mapper, array $path): mixed,
  *     }>,
@@ -15,8 +16,9 @@ use Tcds\Io\Jackson\ObjectMapper;
  * }
  */
 return [
-    'classes' => [
+    'mappers' => [
         App\Models\Foo::class => [],
+        App\Models\UserSettings::class => [],
         App\Queries\InvoiceQuery::class => [],
     ],
     'params' => function () {

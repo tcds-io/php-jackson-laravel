@@ -21,6 +21,11 @@
       "Tcds\\Io\\Jackson\\Laravel\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Test\\Tcds\\Io\\Jackson\\Laravel\\": "tests/"
+    }
+  },
   "scripts": {
     "cs:check": "vendor/bin/php-cs-fixer check -v ./",
     "cs:fix": "vendor/bin/php-cs-fixer fix ./",

@@ -6,7 +6,7 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Psr\Container\ContainerInterface;
+use Psr\Container\ContainerInterface as Container;
 use Symfony\Component\HttpFoundation\Response;
 use Tcds\Io\Generic\Reflection\ReflectionFunction;
 use Tcds\Io\Generic\Reflection\ReflectionFunctionParameter;
@@ -22,23 +22,23 @@ use Tcds\Io\Jackson\ObjectMapper;
 readonly class JacksonLaravelRequestDispatcher
 {
     /** @var array<string, array{ reader?: mixed }> */
-    private array $config;
+    private array $mappers;
 
     /** @var array<string, mixed> */
     private array $data;
 
     public function __construct(
         private ObjectMapper $mapper,
-        private ContainerInterface $container,
+        private Container $container,
         private JacksonLaravelResponseWrapper $wrapper,
         private Request $request,
         Config $config,
     ) {
-        $this->config = $config->get('serializer.classes', []);
-        $customParams = $config->get('serializer.params') ?? fn(ObjectMapper $mapper) => [];
+        $this->mappers = $config->get('jackson.mappers', []);
+        $customParams = $config->get('jackson.params') ?? fn (Container $container, ObjectMapper $mapper) => [];
 
         $this->data = array_merge(
-            $customParams($this->mapper),
+            ReflectionFunction::call($customParams, ['container' => $container, 'mapper' => $this->mapper]),
             $this->request->query->all(),
             $this->request->request->all(),
             $this->request->route()->parameters,
@@ -60,7 +60,7 @@ readonly class JacksonLaravelRequestDispatcher
     {
         return collect($params)
             ->mapWithKeys($this->resolveParamValue(...))
-            ->filter(fn($value) => !is_null($value))
+            ->filter(fn ($value) => !is_null($value))
             ->all();
     }
 
@@ -94,7 +94,7 @@ readonly class JacksonLaravelRequestDispatcher
 
     private function isSerializable(string $type): bool
     {
-        $config = $this->config[$type] ?? null;
+        $config = $this->mappers[$type] ?? null;
 
         if (null === $config) {
             /**

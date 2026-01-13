@@ -9,7 +9,7 @@ use Tcds\Io\Jackson\ObjectMapper;
 
 readonly class JacksonLaravelResponseWrapper
 {
-    public function __construct(private ObjectMapper $mapper, private array $classes)
+    public function __construct(private ObjectMapper $mapper, private array $mappers)
     {
     }
 
@@ -30,6 +30,6 @@ readonly class JacksonLaravelResponseWrapper
         $isList = ReflectionType::isList($type);
         $listType = $isList ? $generics[0] ?? 'mixed' : 'mixed';
 
-        return isset($this->classes[$type]) || ($isList && isset($this->classes[$listType]));
+        return isset($this->mappers[$type]) || ($isList && isset($this->mappers[$listType]));
     }
 }

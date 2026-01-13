@@ -7,6 +7,7 @@ This package lets you:
 - Inject **typed objects** (and collections) directly into controllers and route callables
 - Deserialize from JSON body, query params, form data, and route params
 - Automatically serialize your return values back to JSON using PHP-Jackson
+- Cast models attributes
 
 ---
 
@@ -16,7 +17,7 @@ This package lets you:
 composer require tcds-io/php-jackson-laravel
 ```
 
-Laravel auto‑discovers the service provider.  No manual configuration needed unless you disabled discovery:
+Laravel auto‑discovers the service provider. No manual configuration needed unless you disabled discovery:
 
 ### Manually adding the service provider
 ```php
@@ -103,7 +104,7 @@ Route::post('/callable',
 To enable automatic request → object → response mapping, register your serializable classes in:
 
 ```
-config/serializer.php
+config/jackson.php
 ```
 
 ### Example configuration
@@ -153,6 +154,29 @@ If parsing fails, php-jackson-laravel converts php-jackson `UnableToParseValue` 
   "given": "string"
 }
 ```
+---
+
+## 🪄 Casts
+Model attributes can also be cast using Jackson, all configured classes automatically become castable in models:
+- Add the class to the mappers in `config/jackson.php`
+- Setup attribute casting
+
+```php
+class User extends Model
+{
+    use JacksonCasts;
+
+    protected $fillable = [
+        'settings',
+    ];
+
+    protected $casts = [
+        'settings' => UserSettings::class,
+    ];
+}
+
+```
+
 ---
 
 ## 📦 Related packages
