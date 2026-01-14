@@ -7,7 +7,7 @@
   "require": {
     "php": ">=8.4",
     "ext-json": "*",
-    "tcds-io/php-jackson": "dev-main",
+    "tcds-io/php-jackson": "^1.0.0",
     "laravel/framework": "^12.0.0"
   },
   "require-dev": {

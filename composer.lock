@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "04b5eab677b0297aec36e940e9c1f4bd",
+    "content-hash": "89648e4c1ad740a45bc837d7aee28823",
     "packages": [
         {
             "name": "brick/math",
@@ -1064,12 +1064,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "d8c8dc9cb39217cad9420ee61effc3705b879ad0"
+                "reference": "136332ccdf99fd3aa1da05b417e82a4a63f7f220"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/d8c8dc9cb39217cad9420ee61effc3705b879ad0",
-                "reference": "d8c8dc9cb39217cad9420ee61effc3705b879ad0",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/136332ccdf99fd3aa1da05b417e82a4a63f7f220",
+                "reference": "136332ccdf99fd3aa1da05b417e82a4a63f7f220",
                 "shasum": ""
             },
             "require": {
@@ -1279,7 +1279,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2026-01-12T15:19:06+00:00"
+            "time": "2026-01-13T21:54:36+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -1287,12 +1287,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/prompts.git",
-                "reference": "5c41bf0555b7cfefaad4e66d3046675829581ac4"
+                "reference": "360ba095ef9f51017473505191fbd4ab73e1cab3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/prompts/zipball/5c41bf0555b7cfefaad4e66d3046675829581ac4",
-                "reference": "5c41bf0555b7cfefaad4e66d3046675829581ac4",
+                "url": "https://api.github.com/repos/laravel/prompts/zipball/360ba095ef9f51017473505191fbd4ab73e1cab3",
+                "reference": "360ba095ef9f51017473505191fbd4ab73e1cab3",
                 "shasum": ""
             },
             "require": {
@@ -1339,7 +1339,7 @@
                 "issues": "https://github.com/laravel/prompts/issues",
                 "source": "https://github.com/laravel/prompts/tree/main"
             },
-            "time": "2026-01-07T21:00:29+00:00"
+            "time": "2026-01-13T20:29:29+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -1347,12 +1347,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/serializable-closure.git",
-                "reference": "7581a4407012f5f53365e11bafc520fd7f36bc9b"
+                "reference": "59f9ae92c891beca205b792b0fc4ec6ea2a3ea90"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/serializable-closure/zipball/7581a4407012f5f53365e11bafc520fd7f36bc9b",
-                "reference": "7581a4407012f5f53365e11bafc520fd7f36bc9b",
+                "url": "https://api.github.com/repos/laravel/serializable-closure/zipball/59f9ae92c891beca205b792b0fc4ec6ea2a3ea90",
+                "reference": "59f9ae92c891beca205b792b0fc4ec6ea2a3ea90",
                 "shasum": ""
             },
             "require": {
@@ -1401,7 +1401,7 @@
                 "issues": "https://github.com/laravel/serializable-closure/issues",
                 "source": "https://github.com/laravel/serializable-closure"
             },
-            "time": "2026-01-08T16:22:46+00:00"
+            "time": "2026-01-13T15:41:13+00:00"
         },
         {
             "name": "league/commonmark",
@@ -1789,12 +1789,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/uri.git",
-                "reference": "55638e5ec906ba9d036bef72d64b196ac4a85639"
+                "reference": "72ab19558a801c3c5c25704548bd339165d630df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/uri/zipball/55638e5ec906ba9d036bef72d64b196ac4a85639",
-                "reference": "55638e5ec906ba9d036bef72d64b196ac4a85639",
+                "url": "https://api.github.com/repos/thephpleague/uri/zipball/72ab19558a801c3c5c25704548bd339165d630df",
+                "reference": "72ab19558a801c3c5c25704548bd339165d630df",
                 "shasum": ""
             },
             "require": {
@@ -1880,7 +1880,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-01-10T21:18:24+00:00"
+            "time": "2026-01-13T21:47:52+00:00"
         },
         {
             "name": "league/uri-interfaces",
@@ -1888,12 +1888,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/uri-interfaces.git",
-                "reference": "b958e22f5aad12686e84e2cefcb8eb22dd185360"
+                "reference": "54cfcb84c6be8f0b7d4993829d8d376481211666"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/uri-interfaces/zipball/b958e22f5aad12686e84e2cefcb8eb22dd185360",
-                "reference": "b958e22f5aad12686e84e2cefcb8eb22dd185360",
+                "url": "https://api.github.com/repos/thephpleague/uri-interfaces/zipball/54cfcb84c6be8f0b7d4993829d8d376481211666",
+                "reference": "54cfcb84c6be8f0b7d4993829d8d376481211666",
                 "shasum": ""
             },
             "require": {
@@ -1965,7 +1965,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-01-10T21:18:24+00:00"
+            "time": "2026-01-13T21:47:52+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -5633,7 +5633,7 @@
         },
         {
             "name": "tcds-io/php-better-generics",
-            "version": "dev-main",
+            "version": "0.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tcds-io/php-better-generics.git",
@@ -5654,7 +5654,6 @@
                 "slevomat/coding-standard": "^8.15",
                 "symfony/var-dumper": "^7.2"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -5677,28 +5676,28 @@
             "description": "PHP library to better work with generics",
             "support": {
                 "issues": "https://github.com/tcds-io/php-better-generics/issues",
-                "source": "https://github.com/tcds-io/php-better-generics/tree/main"
+                "source": "https://github.com/tcds-io/php-better-generics/tree/0.1.0"
             },
             "time": "2026-01-13T13:33:25+00:00"
         },
         {
             "name": "tcds-io/php-jackson",
-            "version": "dev-main",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tcds-io/php-jackson.git",
-                "reference": "361f4cfb1fb747c48f5edb254818239726589824"
+                "reference": "10d6f852afa1ac21059b31403c199a080c9235a6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tcds-io/php-jackson/zipball/361f4cfb1fb747c48f5edb254818239726589824",
-                "reference": "361f4cfb1fb747c48f5edb254818239726589824",
+                "url": "https://api.github.com/repos/tcds-io/php-jackson/zipball/10d6f852afa1ac21059b31403c199a080c9235a6",
+                "reference": "10d6f852afa1ac21059b31403c199a080c9235a6",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "php": ">=8.4",
-                "tcds-io/php-better-generics": "dev-main"
+                "tcds-io/php-better-generics": "^0.1.0"
             },
             "require-dev": {
                 "nesbot/carbon": "^3.10",
@@ -5707,7 +5706,6 @@
                 "phpunit/phpunit": "^12.3",
                 "symfony/var-dumper": "^6.0"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -5724,9 +5722,9 @@
             "description": "A lightweight, flexible object serializer for PHP, inspired by FasterXML/jackson",
             "support": {
                 "issues": "https://github.com/tcds-io/php-jackson/issues",
-                "source": "https://github.com/tcds-io/php-jackson/tree/main"
+                "source": "https://github.com/tcds-io/php-jackson/tree/1.0.0"
             },
-            "time": "2026-01-01T15:02:10+00:00"
+            "time": "2026-01-13T21:04:01+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
@@ -6241,8 +6239,8 @@
             "version": "2.1.x-dev",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/4579980f1fb88b30d837aec5477a7497c0a87eb5",
-                "reference": "4579980f1fb88b30d837aec5477a7497c0a87eb5",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/abcab844d794786a601afc87b3bd6b4ead66c2cc",
+                "reference": "abcab844d794786a601afc87b3bd6b4ead66c2cc",
                 "shasum": ""
             },
             "require": {
@@ -6288,7 +6286,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-01-13T09:08:31+00:00"
+            "time": "2026-01-14T06:48:11+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -6678,12 +6676,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "af8e93e48b60ecdd12e9e553fb02ddeae37e393b"
+                "reference": "ad97031249ce64fe24c07adf3772dd2ba09c807d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/af8e93e48b60ecdd12e9e553fb02ddeae37e393b",
-                "reference": "af8e93e48b60ecdd12e9e553fb02ddeae37e393b",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/ad97031249ce64fe24c07adf3772dd2ba09c807d",
+                "reference": "ad97031249ce64fe24c07adf3772dd2ba09c807d",
                 "shasum": ""
             },
             "require": {
@@ -6775,7 +6773,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-01-06T13:40:16+00:00"
+            "time": "2026-01-13T15:05:58+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -7851,9 +7849,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "tcds-io/php-jackson": 20
-    },
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
