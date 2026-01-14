@@ -15,5 +15,6 @@ composer config \
   repositories.php-jackson-laravel '{"type": "path", "url": "./../../", "options": {"symlink": true}}' \
   --working-dir=$WORKDIR
 
-composer require tcds-io/php-jackson:dev-main tcds-io/php-jackson-laravel:* \
+composer require tcds-io/php-jackson \
+    tcds-io/php-jackson-laravel:* \
     --working-dir=$WORKDIR
