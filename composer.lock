@@ -5686,12 +5686,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/tcds-io/php-jackson.git",
-                "reference": "10d6f852afa1ac21059b31403c199a080c9235a6"
+                "reference": "dd10d1d95c07cfef1d6f139f3bf80d3de90dad02"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tcds-io/php-jackson/zipball/10d6f852afa1ac21059b31403c199a080c9235a6",
-                "reference": "10d6f852afa1ac21059b31403c199a080c9235a6",
+                "url": "https://api.github.com/repos/tcds-io/php-jackson/zipball/dd10d1d95c07cfef1d6f139f3bf80d3de90dad02",
+                "reference": "dd10d1d95c07cfef1d6f139f3bf80d3de90dad02",
                 "shasum": ""
             },
             "require": {
@@ -5724,7 +5724,7 @@
                 "issues": "https://github.com/tcds-io/php-jackson/issues",
                 "source": "https://github.com/tcds-io/php-jackson/tree/1.0.0"
             },
-            "time": "2026-01-13T21:04:01+00:00"
+            "time": "2026-01-14T08:38:19+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
@@ -6239,8 +6239,8 @@
             "version": "2.1.x-dev",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/abcab844d794786a601afc87b3bd6b4ead66c2cc",
-                "reference": "abcab844d794786a601afc87b3bd6b4ead66c2cc",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/79c0309345c3dbd1ce55dcd8180cfe1400fbc59d",
+                "reference": "79c0309345c3dbd1ce55dcd8180cfe1400fbc59d",
                 "shasum": ""
             },
             "require": {
@@ -6286,7 +6286,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-01-14T06:48:11+00:00"
+            "time": "2026-01-14T08:09:14+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
