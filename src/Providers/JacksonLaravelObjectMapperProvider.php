@@ -26,7 +26,7 @@ class JacksonLaravelObjectMapperProvider extends ServiceProvider
     {
         $mappers = config('jackson.mappers', []);
 
-        $arrayMapper = new ArrayObjectMapper(typeMappers: [$mappers, ...CollectionMapper::get(Collection::class)]);
+        $arrayMapper = new ArrayObjectMapper(typeMappers: [...$mappers, ...CollectionMapper::get(Collection::class)]);
 
         $this->app->singleton(ArrayObjectMapper::class, fn() => $arrayMapper);
         $this->app->singleton(JsonObjectMapper::class, fn() => new JsonObjectMapper(typeMappers: $mappers));
