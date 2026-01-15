@@ -3,10 +3,10 @@
 namespace Tcds\Io\Jackson\Laravel\Http;
 
 use Illuminate\Config\Repository as Config;
+use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Psr\Container\ContainerInterface as Container;
 use Symfony\Component\HttpFoundation\Response;
 use Tcds\Io\Generic\Reflection\ReflectionFunction;
 use Tcds\Io\Generic\Reflection\ReflectionFunctionParameter;
@@ -18,6 +18,7 @@ use Tcds\Io\Jackson\Exception\JacksonException;
 use Tcds\Io\Jackson\Exception\UnableToParseValue;
 use Tcds\Io\Jackson\Laravel\Http\Dispatchers\JacksonLaravelResponseWrapper;
 use Tcds\Io\Jackson\ObjectMapper;
+use Throwable;
 
 readonly class JacksonLaravelRequestDispatcher
 {
@@ -84,9 +85,8 @@ readonly class JacksonLaravelRequestDispatcher
 
         $value = match (true) {
             $this->isSerializable($main) => $this->parseSerializableType($type, $isList),
-            $this->container->has($type) => $this->container->get($type),
             array_key_exists($name, $this->data) => $this->data[$name],
-            default => throw new JacksonException("Cannot resolve `$type \$$name` from request"),
+            default => $this->make($type, $name),
         };
 
         return [$name => $value];
@@ -148,5 +148,14 @@ readonly class JacksonLaravelRequestDispatcher
             ? $this->request->request->all()
             // return the whole request merged into a single array
             : $this->data;
+    }
+
+    private function make(string $type, string $name): mixed
+    {
+        try {
+            return $this->container->make($type);
+        } catch (Throwable $e) {
+            throw new JacksonException("Cannot resolve `$type \$$name` from request", previous: $e);
+        }
     }
 }
