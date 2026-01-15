@@ -86,7 +86,7 @@ readonly class JacksonLaravelRequestDispatcher
             $this->isSerializable($main) => $this->parseSerializableType($type, $isList),
             $this->container->has($type) => $this->container->get($type),
             array_key_exists($name, $this->data) => $this->data[$name],
-            default => throw new JacksonException("Cannot resolve `$name` from request"),
+            default => throw new JacksonException("Cannot resolve `$type \$$name` from request"),
         };
 
         return [$name => $value];
