@@ -36,7 +36,7 @@ class JacksonLaravelObjectMapperProvider extends ServiceProvider
 
     public function register(): void
     {
-        $config = new JacksonConfig($this->configFile);
+        $config = JacksonConfig::fromConfigFile($this->configFile);
         $mappers = [...$config->mappers, ...CollectionMapper::get(Collection::class)];
         $arrayMapper = new ArrayObjectMapper(typeMappers: $mappers);
         $jsonMapper = new JsonObjectMapper(typeMappers: $mappers);

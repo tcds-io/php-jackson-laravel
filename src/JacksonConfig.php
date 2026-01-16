@@ -16,21 +16,24 @@ use Tcds\Io\Jackson\ObjectMapper;
  */
 readonly class JacksonConfig
 {
-    /** @var Mappers */
-    public array $mappers;
+    /**
+     * @param Mappers $mappers
+     */
+    public function __construct(public array $mappers, private Closure $customParams)
+    {
+    }
 
-    /** @var Closure */
-    private Closure $customParams;
-
-    public function __construct(public string $file)
+    public static function fromConfigFile(string $file): JacksonConfig
     {
         /** @var array{ mappers?: Mappers, params?: CustomParams } $config */
         $config = file_exists($file)
             ? require $file
             : [];
 
-        $this->mappers = $config['mappers'] ?? [];
-        $this->customParams = $config['params'] ?? fn() => [];
+        $mappers = $config['mappers'] ?? [];
+        $customParams = $config['params'] ?? fn() => [];
+
+        return new self($mappers, $customParams);
     }
 
     public function readable(string $type): bool
