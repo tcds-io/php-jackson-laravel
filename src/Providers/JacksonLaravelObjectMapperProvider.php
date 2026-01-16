@@ -50,8 +50,8 @@ class JacksonLaravelObjectMapperProvider extends ServiceProvider
         $this->app->singleton(ControllerDispatcher::class, JacksonLaravelControllerDispatcher::class);
 
         $this->app->singleton(JacksonLaravelResponseWrapper::class, fn() => new JacksonLaravelResponseWrapper(
-            mapper: $arrayMapper,
-            config: $config,
+            mapper: $this->app->get(ObjectMapper::class),
+            config: $this->app->get(JacksonConfig::class),
         ));
     }
 }
