@@ -18,3 +18,12 @@ composer config \
 composer require tcds-io/php-jackson \
     tcds-io/php-jackson-laravel:* \
     --working-dir=$WORKDIR
+
+composer install \
+    --no-ansi \
+    --no-dev \
+    --no-interaction \
+    --no-plugins \
+    --no-progress \
+    --no-scripts \
+    --optimize-autoloader

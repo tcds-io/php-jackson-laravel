@@ -2,14 +2,13 @@
 
 namespace Tcds\Io\Jackson\Laravel\Http\Dispatchers;
 
-use Tcds\Io\Generic\Reflection\Type\Parser\TypeParser;
-use Tcds\Io\Generic\Reflection\Type\ReflectionType;
 use Tcds\Io\Jackson\Laravel\Http\JacksonLaravelResponse;
+use Tcds\Io\Jackson\Laravel\JacksonConfig;
 use Tcds\Io\Jackson\ObjectMapper;
 
 readonly class JacksonLaravelResponseWrapper
 {
-    public function __construct(private ObjectMapper $mapper, private array $mappers)
+    public function __construct(private ObjectMapper $mapper, private JacksonConfig $config)
     {
     }
 
@@ -18,18 +17,8 @@ readonly class JacksonLaravelResponseWrapper
         return match (true) {
             $returnType === 'void' => null,
             $response instanceof JacksonLaravelResponse => $response->toJsonResponse($this->mapper),
-            $this->isSerializable($response, $returnType) => $this->mapper->writeValue($response),
+            $this->config->writable($response, $returnType) => $this->mapper->writeValue($response),
             default => $response,
         };
-    }
-
-    private function isSerializable(mixed $response, string $returnType): bool
-    {
-        [$type, $generics] = TypeParser::getGenericTypes($returnType);
-        $type = $type === 'mixed' && is_object($response) ? $response::class : $type;
-        $isList = ReflectionType::isList($type);
-        $listType = $isList ? $generics[0] ?? 'mixed' : 'mixed';
-
-        return isset($this->mappers[$type]) || ($isList && isset($this->mappers[$listType]));
     }
 }

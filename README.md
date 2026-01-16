@@ -17,6 +17,11 @@ This package lets you:
 composer require tcds-io/php-jackson-laravel
 ```
 
+Then create the configuration file:
+```bash
+php artisan vendor:publish --tag=jackson # creates jackson/config.php
+```
+
 Laravel auto‑discovers the service provider. No manual configuration needed unless you disabled discovery:
 
 ### Manually adding the service provider
