@@ -2,7 +2,6 @@
 
 namespace Tcds\Io\Jackson\Laravel\Http;
 
-use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
@@ -12,38 +11,36 @@ use Tcds\Io\Generic\Reflection\ReflectionFunction;
 use Tcds\Io\Generic\Reflection\ReflectionFunctionParameter;
 use Tcds\Io\Generic\Reflection\ReflectionMethod;
 use Tcds\Io\Generic\Reflection\ReflectionMethodParameter;
-use Tcds\Io\Generic\Reflection\Type\Parser\TypeParser;
 use Tcds\Io\Generic\Reflection\Type\ReflectionType;
 use Tcds\Io\Jackson\Exception\JacksonException;
 use Tcds\Io\Jackson\Exception\UnableToParseValue;
 use Tcds\Io\Jackson\Laravel\Http\Dispatchers\JacksonLaravelResponseWrapper;
+use Tcds\Io\Jackson\Laravel\JacksonConfig;
 use Tcds\Io\Jackson\ObjectMapper;
 use Throwable;
 
-readonly class JacksonLaravelRequestDispatcher
+class JacksonLaravelRequestDispatcher
 {
-    /** @var array<string, array{ reader?: mixed }> */
-    private array $mappers;
+    /** @var array<string, mixed>|null */
+    private ?array $cache = null;
 
     /** @var array<string, mixed> */
-    private array $data;
-
-    public function __construct(
-        private ObjectMapper $mapper,
-        private Container $container,
-        private JacksonLaravelResponseWrapper $wrapper,
-        private Request $request,
-        Config $config,
-    ) {
-        $this->mappers = $config->get('jackson.mappers', []);
-        $customParams = $config->get('jackson.params') ?? fn (Container $container, ObjectMapper $mapper) => [];
-
-        $this->data = array_merge(
-            ReflectionFunction::call($customParams, ['container' => $container, 'mapper' => $this->mapper]),
+    private array $data {
+        get => $this->cache ??= array_merge(
+            $this->config->getCustomParams(container: $this->container, mapper: $this->mapper),
             $this->request->query->all(),
             $this->request->request->all(),
             $this->request->route()->parameters,
         );
+    }
+
+    public function __construct(
+        private readonly ObjectMapper $mapper,
+        private readonly Container $container,
+        private readonly JacksonLaravelResponseWrapper $wrapper,
+        private readonly Request $request,
+        private readonly JacksonConfig $config,
+    ) {
     }
 
     public function dispatch(ReflectionMethod|ReflectionFunction $function, callable $callable): mixed
@@ -61,7 +58,7 @@ readonly class JacksonLaravelRequestDispatcher
     {
         return collect($params)
             ->mapWithKeys($this->resolveParamValue(...))
-            ->filter(fn ($value) => !is_null($value))
+            ->filter(fn($value) => !is_null($value))
             ->all();
     }
 
@@ -70,47 +67,20 @@ readonly class JacksonLaravelRequestDispatcher
      */
     public function resolveParamValue(ReflectionFunctionParameter|ReflectionMethodParameter $param): array
     {
-        $name = $param->name;
-        $type = $param->getType()->getName();
-        [$main, $generics] = TypeParser::getGenericTypes($type);
-        $isList = ReflectionType::isList($main);
-
-        if ($isList) {
-            $main = $generics[0] ?? 'mixed';
-        }
-
         if ($param->isVariadic()) {
             return $this->request->route()->parameters;
         }
 
+        $name = $param->name;
+        $type = $param->getType()->getName();
+
         $value = match (true) {
-            $this->isSerializable($main) => $this->parseSerializableType($type, $isList),
+            $this->config->readable($type) => $this->parseSerializableType($type),
             array_key_exists($name, $this->data) => $this->data[$name],
             default => $this->make($type, $name),
         };
 
         return [$name => $value];
-    }
-
-    private function isSerializable(string $type): bool
-    {
-        $config = $this->mappers[$type] ?? null;
-
-        if (null === $config) {
-            /**
-             * the type was not configured to be read
-             */
-            return false;
-        }
-
-        if (array_key_exists('reader', $config) && $config['reader'] === null) {
-            /**
-             * the type was configured but the reader was set to null, meaning the type should not be read
-             */
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -119,8 +89,10 @@ readonly class JacksonLaravelRequestDispatcher
      * @return T
      * @throws JacksonException
      */
-    private function parseSerializableType(string $type, bool $isList): mixed
+    private function parseSerializableType(string $type): mixed
     {
+        $isList = ReflectionType::isList($type);
+
         try {
             return $this->mapper->readValue(
                 type: $type,

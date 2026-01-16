@@ -3,6 +3,7 @@
 namespace Tcds\Io\Jackson\Laravel\Model;
 
 use Override;
+use Tcds\Io\Jackson\Laravel\JacksonConfig;
 
 trait JacksonCasts
 {
@@ -11,7 +12,7 @@ trait JacksonCasts
      */
     #[Override] public function getCasts(): array
     {
-        $mappers = config('jackson.mappers', []);
+        $mappers = app(JacksonConfig::class)->mappers;
         $casts = parent::getCasts();
 
         foreach ($casts as $column => $cast) {
