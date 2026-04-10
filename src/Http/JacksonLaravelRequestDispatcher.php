@@ -3,10 +3,7 @@
 namespace Tcds\Io\Jackson\Laravel\Http;
 
 use Illuminate\Container\Container;
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Tcds\Io\Generic\Reflection\ReflectionFunction;
 use Tcds\Io\Generic\Reflection\ReflectionFunctionParameter;
 use Tcds\Io\Generic\Reflection\ReflectionMethod;
@@ -16,6 +13,7 @@ use Tcds\Io\Jackson\Exception\JacksonException;
 use Tcds\Io\Jackson\Exception\UnableToParseValue;
 use Tcds\Io\Jackson\Laravel\Http\Dispatchers\JacksonLaravelResponseWrapper;
 use Tcds\Io\Jackson\Laravel\JacksonConfig;
+use Tcds\Io\Jackson\Laravel\JacksonLaravelException;
 use Tcds\Io\Jackson\ObjectMapper;
 use Throwable;
 
@@ -99,13 +97,7 @@ class JacksonLaravelRequestDispatcher
                 value: $this->getRequestData($isList),
             );
         } catch (UnableToParseValue $e) {
-            throw new HttpResponseException(
-                new JsonResponse([
-                    'message' => $e->getMessage(),
-                    'expected' => $e->expected,
-                    'given' => $e->given,
-                ], Response::HTTP_BAD_REQUEST),
-            );
+            throw $this->config->handleRequestError($e);
         }
     }
 
@@ -127,7 +119,7 @@ class JacksonLaravelRequestDispatcher
         try {
             return $this->container->make($type);
         } catch (Throwable $e) {
-            throw new JacksonException("Cannot resolve `$type \$$name` from request", previous: $e);
+            throw new JacksonLaravelException("Cannot resolve `$type \$$name` from request", previous: $e);
         }
     }
 }

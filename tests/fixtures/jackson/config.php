@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Services\AuthTokenService;
 use Psr\Container\ContainerInterface;
+use Tcds\Io\Jackson\Exception\UnableToParseValue;
 use Tcds\Io\Jackson\Node\Reader;
 use Tcds\Io\Jackson\Node\StaticReader;
 use Tcds\Io\Jackson\Node\StaticWriter;
@@ -12,6 +13,9 @@ use Tcds\Io\Jackson\ObjectMapper;
 
 /**
  * @returns array{
+ *     errors?: array{
+ *         request?: Closure(UnableToParseValue $e): Throwable
+ *     },
  *     mappers: array<class-string, array{
  *         reader?: Reader<mixed>|StaticReader<mixed>|Closure(mixed $data, string $type, ObjectMapper $mapper, list<string> $path): mixed,
  *         writer?: Writer<mixed>|StaticWriter<mixed>|Closure(mixed $data, string $type, ObjectMapper $mapper, list<string> $path): mixed,
