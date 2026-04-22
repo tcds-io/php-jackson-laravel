@@ -3,7 +3,10 @@
 namespace Tcds\Io\Jackson\Laravel\Http;
 
 use Illuminate\Container\Container;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Tcds\Io\Generic\Reflection\ReflectionFunction;
 use Tcds\Io\Generic\Reflection\ReflectionFunctionParameter;
 use Tcds\Io\Generic\Reflection\ReflectionMethod;
@@ -38,8 +41,7 @@ class JacksonLaravelRequestDispatcher
         private readonly JacksonLaravelResponseWrapper $wrapper,
         private readonly Request $request,
         private readonly JacksonConfig $config,
-    ) {
-    }
+    ) {}
 
     public function dispatch(ReflectionMethod|ReflectionFunction $function, callable $callable): mixed
     {
@@ -73,7 +75,7 @@ class JacksonLaravelRequestDispatcher
         $type = $param->getType()->getName();
 
         $value = match (true) {
-            $this->config->readable($type) => $this->parseSerializableType($type),
+            $this->config->readable($type) => $this->parseSerializableType($name, $type),
             array_key_exists($name, $this->data) => $this->data[$name],
             default => $this->make($type, $name),
         };
@@ -87,17 +89,25 @@ class JacksonLaravelRequestDispatcher
      * @return T
      * @throws JacksonException
      */
-    private function parseSerializableType(string $type): mixed
+    private function parseSerializableType(string $name, string $type): mixed
     {
-        $isList = ReflectionType::isList($type);
-
         try {
-            return $this->mapper->readValue(
-                type: $type,
-                value: $this->getRequestData($isList),
-            );
+            $isList = ReflectionType::isList($type);
+            $data = $this->getRequestData($isList);
+
+            if (ReflectionType::isEnum($type) && is_a($data[$name] ?? null, $type)) {
+                return $data[$name];
+            }
+
+            return $this->mapper->readValue(type: $type, value: $data);
         } catch (UnableToParseValue $e) {
-            throw $this->config->handleRequestError($e);
+            throw new HttpResponseException(
+                new JsonResponse([
+                    'message' => $e->getMessage(),
+                    'expected' => $e->expected,
+                    'given' => $e->given,
+                ], Response::HTTP_BAD_REQUEST),
+            );
         }
     }
 
