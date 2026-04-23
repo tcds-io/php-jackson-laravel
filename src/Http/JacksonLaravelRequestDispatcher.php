@@ -3,10 +3,7 @@
 namespace Tcds\Io\Jackson\Laravel\Http;
 
 use Illuminate\Container\Container;
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Tcds\Io\Generic\Reflection\ReflectionFunction;
 use Tcds\Io\Generic\Reflection\ReflectionFunctionParameter;
 use Tcds\Io\Generic\Reflection\ReflectionMethod;
@@ -101,13 +98,7 @@ class JacksonLaravelRequestDispatcher
 
             return $this->mapper->readValue(type: $type, value: $data);
         } catch (UnableToParseValue $e) {
-            throw new HttpResponseException(
-                new JsonResponse([
-                    'message' => $e->getMessage(),
-                    'expected' => $e->expected,
-                    'given' => $e->given,
-                ], Response::HTTP_BAD_REQUEST),
-            );
+            throw $this->config->handleRequestError($e);
         }
     }
 
