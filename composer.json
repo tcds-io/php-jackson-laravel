@@ -3,7 +3,7 @@
   "description": "A Laravel plugin to inject and respond serializable objects in controllers",
   "type": "library",
   "license": "MIT",
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "require": {
     "php": ">=8.4",
     "ext-json": "*",
