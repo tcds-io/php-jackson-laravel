@@ -109,14 +109,14 @@ Route::post('/callable',
 To enable automatic request → object → response mapping, register your serializable classes in:
 
 ```
-config/jackson.php
+jackson/config.php
 ```
 
 ### Example configuration
 
 ```php
 return [
-    'classes' => [
+    'mappers' => [
         // Simple automatic serialization
         Address::class => [],
     
@@ -151,7 +151,8 @@ return [
 
 ## 🧪 Error handling
 
-If parsing fails, php-jackson-laravel converts php-jackson `UnableToParseValue`  into `400 Bad Request` HTTP error responses, ex:
+If parsing fails, php-jackson-laravel converts a php-jackson `UnableToParseValue` exception into a `400 Bad Request` HTTP response by default:
+
 ```json
 {
   "message": "Unable to parse value at .type",
@@ -159,11 +160,41 @@ If parsing fails, php-jackson-laravel converts php-jackson `UnableToParseValue` 
   "given": "string"
 }
 ```
+
+### Customizing the error handler
+
+You can replace the default error response by setting `errors.request` in `jackson/config.php`. The handler receives an `UnableToParseValue` exception and must return a `Throwable` (typically an `HttpResponseException`).
+This can be changed to handle it any way you like. The below example mimics the default library behaviour:
+
+```php
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Tcds\Io\Jackson\Exception\UnableToParseValue;
+
+return [
+    'errors' => [
+        'request' => fn(UnableToParseValue $e) => new HttpResponseException(
+            new JsonResponse([
+                'error' => $e->getMessage(),
+                'hint' => 'Check the request body format.',
+            ], Response::HTTP_UNPROCESSABLE_ENTITY),
+        ),
+    ],
+    // ...
+];
+```
+
+The `UnableToParseValue` exception exposes:
+- `$e->getMessage()` — human-readable description of the failure
+- `$e->expected` — list of accepted values or types
+- `$e->given` — the type or value that was received
+
 ---
 
 ## 🪄 Casts
 Model attributes can also be cast using Jackson, all configured classes automatically become castable in models:
-- Add the class to the mappers in `config/jackson.php`
+- Add the class to the mappers in `jackson/config.php`
 - Setup attribute casting
 
 ```php
