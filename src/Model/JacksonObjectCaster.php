@@ -9,7 +9,7 @@ use Tcds\Io\Jackson\ObjectMapper;
 
 /**
  * @template T of object
- * @implements CastsAttributes<T, T>
+ * @implements CastsAttributes<T, T|string>
  */
 class JacksonObjectCaster implements CastsAttributes
 {
@@ -45,6 +45,6 @@ class JacksonObjectCaster implements CastsAttributes
             return is_string($written) ? $written : null;
         }
 
-        return null;
+        return is_string($value) ? $value : null;
     }
 }
