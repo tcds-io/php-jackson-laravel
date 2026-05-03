@@ -9,6 +9,27 @@ use Tests\TestCase;
 class ControllerSerializationTest extends TestCase
 {
     #[Test]
+    public function controller_attribute_inject_and_respond(): void
+    {
+        /**
+         * @see FooBarController::greet
+         */
+        $response = $this->post('/controller/greet', [
+            'message' => 'hello',
+        ]);
+
+        $this->assertJsonStringEqualsJsonString(
+            <<<JSON
+                {
+                  "message": "hello"
+                }
+                JSON,
+            $response->content(),
+        );
+        $response->assertStatus(201);
+    }
+
+    #[Test]
     public function controller_post_inject_param(): void
     {
         /**

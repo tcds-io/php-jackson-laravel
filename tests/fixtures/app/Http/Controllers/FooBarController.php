@@ -3,10 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Foo;
+use App\Models\Greeting;
 use App\Queries\InvoiceQuery;
+use Tcds\Io\Jackson\Laravel\Attributes\Inject;
+use Tcds\Io\Jackson\Laravel\Attributes\Respond;
 
 class FooBarController
 {
+    #[Respond(statusCode: 201)]
+    public function greet(#[Inject] Greeting $greeting): Greeting
+    {
+        return $greeting;
+    }
+
+
     /**
      * @param list<Foo> $items
      * @return list<Foo>
