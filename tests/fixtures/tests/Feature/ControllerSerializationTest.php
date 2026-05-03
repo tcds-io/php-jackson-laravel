@@ -22,13 +22,13 @@ class ControllerSerializationTest extends TestCase
 
         $this->assertJsonStringEqualsJsonString(
             <<<JSON
-            {
-              "id": 10,
-              "a": "something",
-              "b": "something else",
-              "type": "AAA"
-            }
-            JSON,
+                {
+                  "id": 10,
+                  "a": "something",
+                  "b": "something else",
+                  "type": "AAA"
+                }
+                JSON,
             $response->content(),
         );
         $response->assertStatus(200);
@@ -48,12 +48,12 @@ class ControllerSerializationTest extends TestCase
 
         $this->assertJsonStringEqualsJsonString(
             <<<JSON
-            {
-              "message": "Unable to parse value at .type",
-              "expected": ["AAA", "BBB"],
-              "given": "string"
-            }
-            JSON,
+                {
+                  "message": "Unable to parse value at .type",
+                  "expected": ["AAA", "BBB"],
+                  "given": "string"
+                }
+                JSON,
             $response->content(),
         );
         $response->assertStatus(400);
@@ -82,21 +82,21 @@ class ControllerSerializationTest extends TestCase
 
         $this->assertJsonStringEqualsJsonString(
             <<<JSON
-            [
-                {
-                  "id": 10,
-                  "a": "aaa",
-                  "b": "list aaa",
-                  "type": "AAA"
-                },
-                {
-                  "id": 11,
-                  "a": "bbb",
-                  "b": "list bbb",
-                  "type": "BBB"
-                }
-            ]
-            JSON,
+                [
+                    {
+                      "id": 10,
+                      "a": "aaa",
+                      "b": "list aaa",
+                      "type": "AAA"
+                    },
+                    {
+                      "id": 11,
+                      "a": "bbb",
+                      "b": "list bbb",
+                      "type": "BBB"
+                    }
+                ]
+                JSON,
             $response->content(),
         );
         $response->assertStatus(200);
@@ -112,11 +112,11 @@ class ControllerSerializationTest extends TestCase
 
         $this->assertJsonStringEqualsJsonString(
             <<<JSON
-            {
-              "userId": 150,
-              "customer": "Tcds.Io"
-            }
-            JSON,
+                {
+                  "userId": 150,
+                  "customer": "Tcds.Io"
+                }
+                JSON,
             $response->content(),
         );
         $response->assertStatus(200);

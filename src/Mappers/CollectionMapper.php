@@ -5,7 +5,7 @@ namespace Tcds\Io\Jackson\Laravel\Mappers;
 use Closure;
 use Illuminate\Support\Collection;
 use Override;
-use Tcds\Io\Generic\Reflection\Type\Parser\GenericTypeParser;
+use Tcds\Io\Generic\Reflection\Type\Parser\DocBlockTypeResolver;
 use Tcds\Io\Jackson\Node\StaticReader;
 use Tcds\Io\Jackson\Node\StaticWriter;
 use Tcds\Io\Jackson\ObjectMapper;
@@ -22,7 +22,7 @@ class CollectionMapper implements StaticReader, StaticWriter
     public static function read(mixed $data, string $type, ObjectMapper $mapper, array $path): Collection
     {
         /** @var T $main */
-        [$main, $generics] = GenericTypeParser::parse($type);
+        [$main, $generics] = DocBlockTypeResolver::instance()->genericTypeParts($type);
         $type = generic('list', $generics);
         $items = $mapper->readValue($type, $data) ?: [];
 

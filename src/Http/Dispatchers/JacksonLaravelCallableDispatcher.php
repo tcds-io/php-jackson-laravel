@@ -2,6 +2,7 @@
 
 namespace Tcds\Io\Jackson\Laravel\Http\Dispatchers;
 
+use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Routing\CallableDispatcher;
 use Illuminate\Routing\Route;
@@ -23,8 +24,9 @@ class JacksonLaravelCallableDispatcher extends CallableDispatcher
     #[Override]
     public function dispatch(Route $route, $callable)
     {
-        $function = new ReflectionFunction($callable);
+        $closure = Closure::fromCallable($callable);
+        $function = new ReflectionFunction($closure);
 
-        return $this->dispatcher->dispatch($function, $callable);
+        return $this->dispatcher->dispatch($function, $closure);
     }
 }

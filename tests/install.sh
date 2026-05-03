@@ -1,12 +1,13 @@
 #!/bin/bash
 
 WORKDIR=tests/blog
+LARAVEL_VERSION=${LARAVEL_VERSION:-^13.0}
 
 echo "Deleting current blog installation..."
 rm -rf $WORKDIR
 echo "Done!"
 
-composer create-project laravel/laravel $WORKDIR
+composer create-project "laravel/laravel:$LARAVEL_VERSION" $WORKDIR
 composer config minimum-stability dev --working-dir=$WORKDIR
 
 cp -r tests/fixtures/. $WORKDIR

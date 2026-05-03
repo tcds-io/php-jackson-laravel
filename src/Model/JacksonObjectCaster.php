@@ -8,7 +8,8 @@ use Tcds\Io\Jackson\JsonObjectMapper;
 use Tcds\Io\Jackson\ObjectMapper;
 
 /**
- * @template T
+ * @template T of object
+ * @implements CastsAttributes<T, T>
  */
 class JacksonObjectCaster implements CastsAttributes
 {
@@ -38,8 +39,12 @@ class JacksonObjectCaster implements CastsAttributes
     #[Override]
     public function set($model, string $key, $value, array $attributes): ?string
     {
-        return is_a($value, $this->class)
-            ? $this->mapper->writeValue($value)
-            : $value;
+        if ($value instanceof $this->class) {
+            $written = $this->mapper->writeValue($value);
+
+            return is_string($written) ? $written : null;
+        }
+
+        return null;
     }
 }

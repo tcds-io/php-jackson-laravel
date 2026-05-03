@@ -1,5 +1,7 @@
 # PHP Jackson for Laravel
 
+[![CI](https://github.com/tcds-io/php-jackson-laravel/actions/workflows/integration.yml/badge.svg)](https://github.com/tcds-io/php-jackson-laravel/actions/workflows/integration.yml)
+
 Laravel integration for [tcds-io/php-jackson](https://github.com/tcds-io/php-jackson), a type-safe object mapper inspired by Jackson (Java).
 
 This package lets you:
@@ -211,6 +213,23 @@ class User extends Model
     ];
 }
 
+```
+
+---
+
+## 🔧 Development
+
+```bash
+composer install
+composer tests       # runs cs:check + phpstan + phpunit
+composer cs:fix      # auto-fix code style
+```
+
+End-to-end integration tests run a real Laravel app (default Laravel 13). To target Laravel 12:
+
+```bash
+LARAVEL_VERSION='^12.0' tests/install.sh
+cd tests/blog && php artisan test
 ```
 
 ---

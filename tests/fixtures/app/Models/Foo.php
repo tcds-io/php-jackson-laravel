@@ -9,6 +9,5 @@ readonly class Foo
         public string $a,
         public string $b,
         public Type $type,
-    ) {
-    }
+    ) {}
 }
