@@ -16,10 +16,6 @@ use Tcds\Io\Jackson\Laravel\JacksonConfig;
 use Tcds\Io\Jackson\Laravel\Mappers\CollectionMapper;
 use Tcds\Io\Jackson\ObjectMapper;
 
-/**
- * @phpstan-import-type Mappers from JacksonConfig
- * @phpstan-import-type TypeMappers from ObjectMapper
- */
 class JacksonLaravelObjectMapperProvider extends ServiceProvider
 {
     private string $originalConfigFile;
@@ -42,9 +38,11 @@ class JacksonLaravelObjectMapperProvider extends ServiceProvider
     {
         $config = JacksonConfig::fromConfigFile($this->configFile);
         $mappers = [...$config->mappers, ...CollectionMapper::get(Collection::class)];
-        $vendorMappers = $this->filterNullableEntries($mappers);
-        $arrayMapper = new ArrayObjectMapper(typeMappers: $vendorMappers);
-        $jsonMapper = new JsonObjectMapper(typeMappers: $vendorMappers);
+        // null reader/writer is an explicit opt-out signal ("let the framework resolve this type").
+        // php-jackson honors null at runtime via `??` fallback, but its TypeMapper PHPDoc does not yet
+        // declare `|null`. Remove the ignores once the upstream type is widened to include null.
+        $arrayMapper = new ArrayObjectMapper(typeMappers: $mappers); // @phpstan-ignore-line argument.type
+        $jsonMapper = new JsonObjectMapper(typeMappers: $mappers); // @phpstan-ignore-line argument.type
 
         $this->app->singleton(JacksonConfig::class, fn() => $config);
         $this->app->singleton(ArrayObjectMapper::class, fn() => $arrayMapper);
@@ -58,26 +56,5 @@ class JacksonLaravelObjectMapperProvider extends ServiceProvider
             mapper: $this->app->get(ObjectMapper::class),
             config: $this->app->get(JacksonConfig::class),
         ));
-    }
-
-    /**
-     * @param Mappers $mappers
-     * @return TypeMappers
-     */
-    private function filterNullableEntries(array $mappers): array
-    {
-        $result = [];
-        foreach ($mappers as $type => $mapper) {
-            $entry = [];
-            if (isset($mapper['reader'])) {
-                $entry['reader'] = $mapper['reader'];
-            }
-            if (isset($mapper['writer'])) {
-                $entry['writer'] = $mapper['writer'];
-            }
-            $result[$type] = $entry;
-        }
-
-        return $result;
     }
 }
