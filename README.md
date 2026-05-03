@@ -151,6 +151,39 @@ return [
 
 ---
 
+## 🏷 Attribute-based injection & response
+
+Instead of registering a type globally in `mappers`, you can opt in per parameter or per method using attributes. The attribute always wins over the global config.
+
+```php
+use Tcds\Io\Jackson\Laravel\Attributes\Inject;
+use Tcds\Io\Jackson\Laravel\Attributes\Respond;
+
+class GreetController
+{
+    #[Respond(statusCode: 201)]
+    public function __invoke(#[Inject] Greeting $greeting): Greeting
+    {
+        return $greeting;
+    }
+}
+```
+
+- **`#[Inject]`** on a parameter forces php-jackson to deserialize the request payload into that type, even when the type is not registered in `mappers` (or has been opted out via `reader: null`).
+- **`#[Respond(statusCode: 201)]`** on a method (or callable) serializes the return value via php-jackson and wraps it in a `JsonResponse` with the given status. `statusCode` defaults to `200`.
+
+Both attributes also work on route closures:
+
+```php
+Route::post(
+    '/greet',
+    #[Respond(statusCode: 201)]
+    fn(#[Inject] Greeting $greeting): Greeting => $greeting,
+);
+```
+
+---
+
 ## 🧪 Error handling
 
 If parsing fails, php-jackson-laravel converts a php-jackson `UnableToParseValue` exception into a `400 Bad Request` HTTP response by default:

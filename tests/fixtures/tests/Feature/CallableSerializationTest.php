@@ -73,6 +73,27 @@ class CallableSerializationTest extends TestCase
     }
 
     #[Test]
+    public function callable_attribute_inject_and_respond(): void
+    {
+        /**
+         * @see routes/web.php
+         */
+        $response = $this->post('/callable/greet', [
+            'message' => 'hello',
+        ]);
+
+        $this->assertJsonStringEqualsJsonString(
+            <<<JSON
+                {
+                  "message": "hello"
+                }
+                JSON,
+            $response->content(),
+        );
+        $response->assertStatus(201);
+    }
+
+    #[Test]
     public function callable_inject_param(): void
     {
         /**
