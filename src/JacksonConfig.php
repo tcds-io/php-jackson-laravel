@@ -8,16 +8,24 @@ use Illuminate\Http\JsonResponse;
 use Psr\Container\ContainerInterface as Container;
 use Symfony\Component\HttpFoundation\Response;
 use Tcds\Io\Generic\Reflection\ReflectionFunction;
-use Tcds\Io\Generic\Reflection\Type\Parser\TypeParser;
+use Tcds\Io\Generic\Reflection\Type\Parser\DocBlockTypeResolver;
 use Tcds\Io\Generic\Reflection\Type\ReflectionType;
 use Tcds\Io\Jackson\Exception\UnableToParseValue;
+use Tcds\Io\Jackson\Node\Reader;
+use Tcds\Io\Jackson\Node\StaticReader;
+use Tcds\Io\Jackson\Node\StaticWriter;
+use Tcds\Io\Jackson\Node\Writer;
 use Tcds\Io\Jackson\ObjectMapper;
 use Throwable;
 
 /**
- * @phpstan-import-type TypeMapper from ObjectMapper
- * @phpstan-type Mappers array<string, TypeMapper>
- * @phpstan-type CustomParams Closure(...$args): array<string, mixed>
+ * @phpstan-import-type MapperClosure from ObjectMapper
+ * @phpstan-type Mapper array{
+ *      reader?: Reader<mixed>|StaticReader<mixed>|MapperClosure|null,
+ *      writer?: Writer<mixed>|StaticWriter<mixed>|MapperClosure|null,
+ *  }
+ * @phpstan-type Mappers array<string, Mapper>
+ * @phpstan-type CustomParams Closure(): array<string, mixed>
  * @phpstan-type RequestErrorHandler Closure(UnableToParseValue $e): Throwable
  */
 readonly class JacksonConfig
@@ -31,8 +39,7 @@ readonly class JacksonConfig
         public array $mappers,
         private Closure $customParams,
         private ?Closure $requestErrorHandler,
-    ) {
-    }
+    ) {}
 
     public static function fromConfigFile(string $file): JacksonConfig
     {
@@ -61,7 +68,7 @@ readonly class JacksonConfig
 
     public function readable(string $type): bool
     {
-        [$main, $generics] = TypeParser::getGenericTypes($type);
+        [$main, $generics] = DocBlockTypeResolver::instance()->genericTypeParts($type);
         $isList = ReflectionType::isList($main);
 
         if ($isList) {
@@ -89,7 +96,7 @@ readonly class JacksonConfig
 
     public function writable(mixed $value, string $returnType): bool
     {
-        [$type, $generics] = TypeParser::getGenericTypes($returnType);
+        [$type, $generics] = DocBlockTypeResolver::instance()->genericTypeParts($returnType);
         $type = $type === 'mixed' && is_object($value) ? $value::class : $type;
         $isList = ReflectionType::isList($type);
         $listType = $isList ? $generics[0] ?? 'mixed' : 'mixed';
@@ -102,6 +109,7 @@ readonly class JacksonConfig
      */
     public function getCustomParams(Container $container, ObjectMapper $mapper): array
     {
+        /** @var array<string, mixed> */
         return ReflectionFunction::call($this->customParams, [
             'container' => $container,
             'mapper' => $mapper,

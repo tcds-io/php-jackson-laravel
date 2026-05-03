@@ -7,12 +7,14 @@ use Tcds\Io\Jackson\ObjectMapper;
 
 readonly class JacksonLaravelResponse
 {
+    /**
+     * @param array<string, string|list<string>> $headers
+     */
     public function __construct(
         private mixed $serializable,
         private int $status = 200,
         private array $headers = [],
-    ) {
-    }
+    ) {}
 
     public function toJsonResponse(ObjectMapper $mapper): JsonResponse
     {

@@ -6,10 +6,11 @@ use App\Models\Type;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => response()->json(['foo' => 'bar']));
-Route::get('/callable/resource/{id}', fn(int $id) => new Foo(id: $id, a: "aaa", b: "get", type: Type::AAA));
+Route::get('/callable/resource/{id}', fn(int $id) => new Foo(id: $id, a: 'aaa', b: 'get', type: Type::AAA));
 Route::post('/callable/resource', fn(Foo $foo) => $foo);
 
-Route::post('/callable',
+Route::post(
+    '/callable',
     /**
      * @param list<Foo> $items
      * @return list<Foo>

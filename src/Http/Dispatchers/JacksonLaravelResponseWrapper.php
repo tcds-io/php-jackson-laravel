@@ -8,9 +8,7 @@ use Tcds\Io\Jackson\ObjectMapper;
 
 readonly class JacksonLaravelResponseWrapper
 {
-    public function __construct(private ObjectMapper $mapper, private JacksonConfig $config)
-    {
-    }
+    public function __construct(private ObjectMapper $mapper, private JacksonConfig $config) {}
 
     public function respond(mixed $response, string $returnType): mixed
     {

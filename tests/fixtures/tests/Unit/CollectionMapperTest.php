@@ -12,11 +12,11 @@ use Tcds\Io\Jackson\Laravel\Mappers\CollectionMapper;
 class CollectionMapperTest extends TestCase
 {
     private const string JSON_CONTENT = <<<JSON
-    [
-      {"userId": 10, "customer": "Arthur Dent"},
-      {"userId": 15, "customer": "Ford Prefect"}
-    ]
-    JSON;
+        [
+          {"userId": 10, "customer": "Arthur Dent"},
+          {"userId": 15, "customer": "Ford Prefect"}
+        ]
+        JSON;
 
     #[Test]
     public function collection_reader_and_writer(): void
@@ -88,11 +88,11 @@ class CollectionMapperTest extends TestCase
 
         $this->assertJsonStringEqualsJsonString(
             <<<JSON
-            [
-              {"userId": 10, "customer": "Arthur Dent"},
-              {"userId": 15, "customer": "Ford Prefect"}
-            ]
-            JSON,
+                [
+                  {"userId": 10, "customer": "Arthur Dent"},
+                  {"userId": 15, "customer": "Ford Prefect"}
+                ]
+                JSON,
             $json,
         );
     }
@@ -112,11 +112,11 @@ class CollectionMapperTest extends TestCase
 
         $this->assertJsonStringEqualsJsonString(
             <<<JSON
-            [
-              {"userId": 10, "customer": "Arthur Dent"},
-              {"userId": 15, "customer": "Ford Prefect"}
-            ]
-            JSON,
+                [
+                  {"userId": 10, "customer": "Arthur Dent"},
+                  {"userId": 15, "customer": "Ford Prefect"}
+                ]
+                JSON,
             $json,
         );
     }

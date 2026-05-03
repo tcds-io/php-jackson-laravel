@@ -16,11 +16,15 @@ class JacksonLaravelControllerDispatcher extends ControllerDispatcher
         parent::__construct($container);
     }
 
+    /**
+     * @param object $controller
+     * @param string $method
+     */
     #[Override]
     public function dispatch(Route $route, $controller, $method)
     {
         $function = new ReflectionClass($controller::class)->getMethod($method);
 
-        return $this->dispatcher->dispatch($function, [$controller, $method]);
+        return $this->dispatcher->dispatch($function, $controller->$method(...));
     }
 }

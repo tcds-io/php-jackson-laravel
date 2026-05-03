@@ -1,0 +1,9 @@
+parameters:
+  level: max
+  paths:
+    - src
+  bootstrapFiles:
+    - vendor/autoload.php
+  excludePaths:
+    analyse:
+      - src/Model/JacksonCasts.php

@@ -24,12 +24,21 @@ class JacksonLaravelRequestDispatcher
 
     /** @var array<string, mixed> */
     private array $data {
-        get => $this->cache ??= array_merge(
-            $this->config->getCustomParams(container: $this->container, mapper: $this->mapper),
-            $this->request->query->all(),
-            $this->request->request->all(),
-            $this->request->route()->parameters,
-        );
+        get {
+            if ($this->cache !== null) {
+                return $this->cache;
+            }
+
+            /** @var array<string, mixed> $routeParams */
+            $routeParams = $this->request->route()->parameters ?? [];
+
+            return $this->cache = array_merge(
+                $this->config->getCustomParams(container: $this->container, mapper: $this->mapper),
+                $this->request->query->all(),
+                $this->request->request->all(),
+                $routeParams,
+            );
+        }
     }
 
     public function __construct(
@@ -51,12 +60,18 @@ class JacksonLaravelRequestDispatcher
         return $this->wrapper->respond($response, $returnType);
     }
 
+    /**
+     * @param list<ReflectionFunctionParameter|ReflectionMethodParameter> $params
+     * @return array<string, mixed>
+     */
     private function resolveParams(array $params): array
     {
-        return collect($params)
-            ->mapWithKeys($this->resolveParamValue(...))
-            ->filter(fn($value) => !is_null($value))
-            ->all();
+        $resolved = [];
+        foreach ($params as $param) {
+            $resolved += $this->resolveParamValue($param);
+        }
+
+        return array_filter($resolved, fn($value) => !is_null($value));
     }
 
     /**
@@ -65,7 +80,10 @@ class JacksonLaravelRequestDispatcher
     public function resolveParamValue(ReflectionFunctionParameter|ReflectionMethodParameter $param): array
     {
         if ($param->isVariadic()) {
-            return $this->request->route()->parameters;
+            /** @var array<string, mixed> $routeParams */
+            $routeParams = $this->request->route()->parameters ?? [];
+
+            return [$param->name => $routeParams];
         }
 
         $name = $param->name;
@@ -81,9 +99,6 @@ class JacksonLaravelRequestDispatcher
     }
 
     /**
-     * @template T of object
-     * @param class-string<T> $type
-     * @return T
      * @throws JacksonException
      */
     private function parseSerializableType(string $name, string $type): mixed
@@ -92,11 +107,11 @@ class JacksonLaravelRequestDispatcher
             $isList = ReflectionType::isList($type);
             $data = $this->getRequestData($isList);
 
-            if (ReflectionType::isEnum($type) && is_a($data[$name] ?? null, $type)) {
+            if (ReflectionType::isEnum($type) && ($data[$name] ?? null) instanceof $type) {
                 return $data[$name];
             }
 
-            return $this->mapper->readValue(type: $type, value: $data);
+            return $this->mapper->readValue(type: generic($type, []), value: $data);
         } catch (UnableToParseValue $e) {
             throw $this->config->handleRequestError($e);
         }
