@@ -156,20 +156,20 @@ return [
 Instead of registering a type globally in `mappers`, you can opt in per parameter or per method using attributes. The attribute always wins over the global config.
 
 ```php
-use Tcds\Io\Jackson\Laravel\Attributes\Inject;
+use Tcds\Io\Jackson\Laravel\Attributes\JacksonInject;
 use Tcds\Io\Jackson\Laravel\Attributes\JacksonResponse;
 
 class GreetController
 {
     #[JacksonResponse(status: 201, headers: ['X-Resource' => 'greeting'])]
-    public function __invoke(#[Inject] Greeting $greeting): Greeting
+    public function __invoke(#[JacksonInject] Greeting $greeting): Greeting
     {
         return $greeting;
     }
 }
 ```
 
-- **`#[Inject]`** on a parameter forces php-jackson to deserialize the request payload into that type, even when the type is not registered in `mappers` (or has been opted out via `reader: null`).
+- **`#[JacksonInject]`** on a parameter forces php-jackson to deserialize the request payload into that type, even when the type is not registered in `mappers` (or has been opted out via `reader: null`).
 - **`#[JacksonResponse(status: 201)]`** on a method (or callable) serializes the return value via php-jackson and wraps it in a `JsonResponse` with the given status and headers. `status` defaults to `200`.
 
 Both attributes also work on route closures:
@@ -178,7 +178,7 @@ Both attributes also work on route closures:
 Route::post(
     '/greet',
     #[JacksonResponse(status: 201)]
-    fn(#[Inject] Greeting $greeting): Greeting => $greeting,
+    fn(#[JacksonInject] Greeting $greeting): Greeting => $greeting,
 );
 ```
 
@@ -189,7 +189,7 @@ use function Tcds\Io\Jackson\Laravel\jackson;
 
 class GreetController
 {
-    public function store(#[Inject] Greeting $greeting)
+    public function store(#[JacksonInject] Greeting $greeting)
     {
         return jackson($greeting)
             ->status(201)
