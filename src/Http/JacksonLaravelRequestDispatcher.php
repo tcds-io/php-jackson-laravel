@@ -12,7 +12,7 @@ use Tcds\Io\Generic\Reflection\Type\ReflectionType;
 use Tcds\Io\Jackson\Exception\JacksonException;
 use Tcds\Io\Jackson\Exception\UnableToParseValue;
 use Tcds\Io\Jackson\Laravel\Attributes\Inject;
-use Tcds\Io\Jackson\Laravel\Attributes\Respond;
+use Tcds\Io\Jackson\Laravel\Attributes\JacksonResponse;
 use Tcds\Io\Jackson\Laravel\Http\Dispatchers\JacksonLaravelResponseWrapper;
 use Tcds\Io\Jackson\Laravel\JacksonConfig;
 use Tcds\Io\Jackson\Laravel\JacksonLaravelException;
@@ -56,11 +56,11 @@ class JacksonLaravelRequestDispatcher
         $returnType = $function->getReturnType()->getName();
         $params = $function->getParameters();
         $resolved = $this->resolveParams($params);
-        $respond = ($function->getAttributes(Respond::class)[0] ?? null)?->newInstance();
+        $jacksonResponse = ($function->getAttributes(JacksonResponse::class)[0] ?? null)?->newInstance();
 
         $response = call_user_func($callable, ...$resolved);
 
-        return $this->wrapper->respond($response, $returnType, $respond);
+        return $this->wrapper->respond($response, $returnType, $jacksonResponse);
     }
 
     /**
