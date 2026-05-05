@@ -17,12 +17,11 @@ readonly class JacksonLaravelResponseWrapper
         return match (true) {
             $returnType === 'void' => null,
             $response instanceof JacksonResponse => $response->toJsonResponse($this->mapper),
-            $jacksonResponse !== null => new JsonResponse(
+            $this->config->writable($response, $returnType, $jacksonResponse) => new JsonResponse(
                 data: $this->mapper->writeValue($response),
-                status: $jacksonResponse->status,
-                headers: $jacksonResponse->headers,
+                status: $jacksonResponse->status ?? 200,
+                headers: $jacksonResponse->headers ?? ['Content-Type' => 'application/json'],
             ),
-            $this->config->writable($response, $returnType) => $this->mapper->writeValue($response),
             default => $response,
         };
     }

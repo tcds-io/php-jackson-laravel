@@ -11,6 +11,7 @@ use Tcds\Io\Generic\Reflection\ReflectionFunction;
 use Tcds\Io\Generic\Reflection\Type\Parser\DocBlockTypeResolver;
 use Tcds\Io\Generic\Reflection\Type\ReflectionType;
 use Tcds\Io\Jackson\Exception\UnableToParseValue;
+use Tcds\Io\Jackson\Laravel\Attributes\JacksonResponse;
 use Tcds\Io\Jackson\Node\Reader;
 use Tcds\Io\Jackson\Node\StaticReader;
 use Tcds\Io\Jackson\Node\StaticWriter;
@@ -94,8 +95,12 @@ readonly class JacksonConfig
         return true;
     }
 
-    public function writable(mixed $value, string $returnType): bool
+    public function writable(mixed $value, string $returnType, ?JacksonResponse $jacksonResponse = null): bool
     {
+        if ($jacksonResponse !== null) {
+            return true;
+        }
+
         [$type, $generics] = DocBlockTypeResolver::instance()->genericTypeParts($returnType);
         $type = $type === 'mixed' && is_object($value) ? $value::class : $type;
         $isList = ReflectionType::isList($type);
