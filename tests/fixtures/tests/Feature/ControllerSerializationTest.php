@@ -9,7 +9,7 @@ use Tests\TestCase;
 class ControllerSerializationTest extends TestCase
 {
     #[Test]
-    public function controller_attribute_inject_and_respond(): void
+    public function controller_attribute_inject_and_jackson_response(): void
     {
         /**
          * @see FooBarController::greet
@@ -27,6 +27,29 @@ class ControllerSerializationTest extends TestCase
             $response->content(),
         );
         $response->assertStatus(201);
+        $response->assertHeader('X-Jackson', 'attribute');
+    }
+
+    #[Test]
+    public function controller_fluent_jackson_response(): void
+    {
+        /**
+         * @see FooBarController::greetResponse
+         */
+        $response = $this->post('/controller/greet-response', [
+            'message' => 'hello',
+        ]);
+
+        $this->assertJsonStringEqualsJsonString(
+            <<<JSON
+                {
+                  "message": "hello"
+                }
+                JSON,
+            $response->content(),
+        );
+        $response->assertStatus(201);
+        $response->assertHeader('X-Jackson', 'fluent');
     }
 
     #[Test]

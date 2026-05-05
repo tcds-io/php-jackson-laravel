@@ -73,7 +73,7 @@ class CallableSerializationTest extends TestCase
     }
 
     #[Test]
-    public function callable_attribute_inject_and_respond(): void
+    public function callable_attribute_inject_and_jackson_response(): void
     {
         /**
          * @see routes/web.php
@@ -91,6 +91,29 @@ class CallableSerializationTest extends TestCase
             $response->content(),
         );
         $response->assertStatus(201);
+        $response->assertHeader('X-Jackson', 'attribute');
+    }
+
+    #[Test]
+    public function callable_fluent_jackson_response(): void
+    {
+        /**
+         * @see routes/web.php
+         */
+        $response = $this->post('/callable/greet-response', [
+            'message' => 'hello',
+        ]);
+
+        $this->assertJsonStringEqualsJsonString(
+            <<<JSON
+                {
+                  "message": "hello"
+                }
+                JSON,
+            $response->content(),
+        );
+        $response->assertStatus(201);
+        $response->assertHeader('X-Jackson', 'fluent');
     }
 
     #[Test]
