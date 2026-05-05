@@ -2,11 +2,11 @@
 
 namespace Tcds\Io\Jackson\Laravel\Providers;
 
-use Carbon\Laravel\ServiceProvider;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Contracts\CallableDispatcher;
 use Illuminate\Routing\Contracts\ControllerDispatcher;
 use Illuminate\Support\Collection;
+use Illuminate\Support\ServiceProvider;
 use Tcds\Io\Jackson\ArrayObjectMapper;
 use Tcds\Io\Jackson\JsonObjectMapper;
 use Tcds\Io\Jackson\Laravel\Http\Dispatchers\JacksonLaravelCallableDispatcher;

@@ -45,6 +45,14 @@ class FooBarController
         );
     }
 
+    /**
+     * @return array{name: ?string}
+     */
+    public function nullable(?string $name): array
+    {
+        return ['name' => $name];
+    }
+
     public function invoices(InvoiceQuery $query): InvoiceQuery
     {
         return $query;

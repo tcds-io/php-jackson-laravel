@@ -215,6 +215,27 @@ class ControllerSerializationTest extends TestCase
     }
 
     #[Test]
+    public function controller_preserves_explicit_null_params(): void
+    {
+        /**
+         * @see FooBarController::nullable
+         */
+        $response = $this->postJson('/controller/nullable', [
+            'name' => null,
+        ]);
+
+        $this->assertJsonStringEqualsJsonString(
+            <<<JSON
+                {
+                  "name": null
+                }
+                JSON,
+            $response->content(),
+        );
+        $response->assertStatus(200);
+    }
+
+    #[Test]
     public function custom_params(): void
     {
         /**

@@ -75,7 +75,7 @@ class JacksonLaravelRequestDispatcher
             $resolved += $this->resolveParamValue($param);
         }
 
-        return array_filter($resolved, fn($value) => !is_null($value));
+        return $resolved;
     }
 
     /**
