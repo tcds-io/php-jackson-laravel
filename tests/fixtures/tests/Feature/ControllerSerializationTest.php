@@ -79,6 +79,31 @@ class ControllerSerializationTest extends TestCase
     }
 
     #[Test]
+    public function controller_json_body_query_and_path_params_are_injected_into_object(): void
+    {
+        /**
+         * @see FooBarController::read
+         */
+        $response = $this->postJson('/controller/10?a=from-query', [
+            'b' => 'from-json',
+            'type' => 'AAA',
+        ]);
+
+        $this->assertJsonStringEqualsJsonString(
+            <<<JSON
+                {
+                  "id": 10,
+                  "a": "from-query",
+                  "b": "from-json",
+                  "type": "AAA"
+                }
+                JSON,
+            $response->content(),
+        );
+        $response->assertStatus(200);
+    }
+
+    #[Test]
     public function controller_invalid_inject_param(): void
     {
         /**
@@ -110,6 +135,49 @@ class ControllerSerializationTest extends TestCase
          * @see FooBarController::list
          */
         $response = $this->post('/controller', [
+            [
+                'id' => 10,
+                'a' => 'aaa',
+                'b' => 'list aaa',
+                'type' => 'AAA',
+            ],
+            [
+                'id' => 11,
+                'a' => 'bbb',
+                'b' => 'list bbb',
+                'type' => 'BBB',
+            ],
+        ]);
+
+        $this->assertJsonStringEqualsJsonString(
+            <<<JSON
+                [
+                    {
+                      "id": 10,
+                      "a": "aaa",
+                      "b": "list aaa",
+                      "type": "AAA"
+                    },
+                    {
+                      "id": 11,
+                      "a": "bbb",
+                      "b": "list bbb",
+                      "type": "BBB"
+                    }
+                ]
+                JSON,
+            $response->content(),
+        );
+        $response->assertStatus(200);
+    }
+
+    #[Test]
+    public function controller_json_list_uses_body_without_query_params(): void
+    {
+        /**
+         * @see FooBarController::list
+         */
+        $response = $this->postJson('/controller?id=999', [
             [
                 'id' => 10,
                 'a' => 'aaa',
