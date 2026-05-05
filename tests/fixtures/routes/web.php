@@ -5,7 +5,7 @@ use App\Models\Foo;
 use App\Models\Greeting;
 use App\Models\Type;
 use Illuminate\Support\Facades\Route;
-use Tcds\Io\Jackson\Laravel\Attributes\Inject;
+use Tcds\Io\Jackson\Laravel\Attributes\JacksonInject;
 use Tcds\Io\Jackson\Laravel\Attributes\JacksonResponse;
 
 use function Tcds\Io\Jackson\Laravel\jackson;
@@ -26,12 +26,12 @@ Route::post(
 Route::post(
     '/callable/greet',
     #[JacksonResponse(status: 201, headers: ['X-Jackson' => 'attribute'])]
-    fn(#[Inject] Greeting $greeting): Greeting => $greeting,
+    fn(#[JacksonInject] Greeting $greeting): Greeting => $greeting,
 );
 
 Route::post(
     '/callable/greet-response',
-    fn(#[Inject] Greeting $greeting) => jackson($greeting)
+    fn(#[JacksonInject] Greeting $greeting) => jackson($greeting)
         ->status(201)
         ->header('X-Jackson', 'fluent'),
 );

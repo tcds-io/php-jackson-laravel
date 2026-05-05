@@ -11,7 +11,7 @@ use Tcds\Io\Generic\Reflection\ReflectionMethodParameter;
 use Tcds\Io\Generic\Reflection\Type\ReflectionType;
 use Tcds\Io\Jackson\Exception\JacksonException;
 use Tcds\Io\Jackson\Exception\UnableToParseValue;
-use Tcds\Io\Jackson\Laravel\Attributes\Inject;
+use Tcds\Io\Jackson\Laravel\Attributes\JacksonInject;
 use Tcds\Io\Jackson\Laravel\Attributes\JacksonResponse;
 use Tcds\Io\Jackson\Laravel\Http\Dispatchers\JacksonLaravelResponseWrapper;
 use Tcds\Io\Jackson\Laravel\JacksonConfig;
@@ -92,7 +92,7 @@ class JacksonLaravelRequestDispatcher
 
         $name = $param->name;
         $type = $param->getType()->getName();
-        $hasInject = $param->getAttributes(Inject::class) !== [];
+        $hasInject = $param->getAttributes(JacksonInject::class) !== [];
 
         $value = match (true) {
             $hasInject => $this->parseSerializableType($name, $type),

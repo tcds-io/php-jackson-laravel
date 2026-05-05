@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Foo;
 use App\Models\Greeting;
 use App\Queries\InvoiceQuery;
-use Tcds\Io\Jackson\Laravel\Attributes\Inject;
+use Tcds\Io\Jackson\Laravel\Attributes\JacksonInject;
 use Tcds\Io\Jackson\Laravel\Attributes\JacksonResponse;
 use Tcds\Io\Jackson\Laravel\Http\JacksonResponse as JacksonHttpResponse;
 
@@ -14,12 +14,12 @@ use function Tcds\Io\Jackson\Laravel\jackson;
 class FooBarController
 {
     #[JacksonResponse(status: 201, headers: ['X-Jackson' => 'attribute'])]
-    public function greet(#[Inject] Greeting $greeting): Greeting
+    public function greet(#[JacksonInject] Greeting $greeting): Greeting
     {
         return $greeting;
     }
 
-    public function greetResponse(#[Inject] Greeting $greeting): JacksonHttpResponse
+    public function greetResponse(#[JacksonInject] Greeting $greeting): JacksonHttpResponse
     {
         return jackson($greeting)
             ->status(201)
