@@ -26,7 +26,11 @@ class JacksonLaravelCallableDispatcher extends CallableDispatcher
     {
         $closure = Closure::fromCallable($callable);
         $function = new ReflectionFunction($closure);
+        $parameters = $this->resolveMethodDependencies(
+            $this->dispatcher->seedParameters($function, $route->parametersWithoutNulls()),
+            new \ReflectionFunction($closure),
+        );
 
-        return $this->dispatcher->dispatch($function, $closure);
+        return $this->dispatcher->dispatch($function, $closure, $parameters);
     }
 }

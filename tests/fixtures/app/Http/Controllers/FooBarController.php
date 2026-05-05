@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Foo;
 use App\Models\Greeting;
 use App\Queries\InvoiceQuery;
+use App\Services\AuthTokenService;
 use Tcds\Io\Jackson\Laravel\Attributes\JacksonInject;
 use Tcds\Io\Jackson\Laravel\Attributes\JacksonResponse;
 use Tcds\Io\Jackson\Laravel\Http\JacksonResponse as JacksonHttpResponse;
@@ -48,9 +49,25 @@ class FooBarController
     /**
      * @return array{name: ?string}
      */
-    public function nullable(?string $name): array
+    public function missingNullable(?string $name = null): array
     {
         return ['name' => $name];
+    }
+
+    /**
+     * @return array{sort: string}
+     */
+    public function defaulted(string $sort = 'created_at'): array
+    {
+        return ['sort' => $sort];
+    }
+
+    /**
+     * @return array{userId: int}
+     */
+    public function service(AuthTokenService $authTokenService): array
+    {
+        return $authTokenService->getClaims();
     }
 
     public function invoices(InvoiceQuery $query): InvoiceQuery

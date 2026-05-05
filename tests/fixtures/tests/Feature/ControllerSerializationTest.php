@@ -215,19 +215,55 @@ class ControllerSerializationTest extends TestCase
     }
 
     #[Test]
-    public function controller_preserves_explicit_null_params(): void
+    public function controller_uses_null_for_missing_nullable_params(): void
     {
         /**
-         * @see FooBarController::nullable
+         * @see FooBarController::missingNullable
          */
-        $response = $this->postJson('/controller/nullable', [
-            'name' => null,
-        ]);
+        $response = $this->postJson('/controller/missing-nullable', []);
 
         $this->assertJsonStringEqualsJsonString(
             <<<JSON
                 {
                   "name": null
+                }
+                JSON,
+            $response->content(),
+        );
+        $response->assertStatus(200);
+    }
+
+    #[Test]
+    public function controller_uses_default_values_for_missing_params(): void
+    {
+        /**
+         * @see FooBarController::defaulted
+         */
+        $response = $this->postJson('/controller/defaulted', []);
+
+        $this->assertJsonStringEqualsJsonString(
+            <<<JSON
+                {
+                  "sort": "created_at"
+                }
+                JSON,
+            $response->content(),
+        );
+        $response->assertStatus(200);
+    }
+
+    #[Test]
+    public function controller_resolves_missing_class_params_from_container(): void
+    {
+        /**
+         * @see FooBarController::service
+         */
+        $response = $this->postJson('/controller/service', []);
+
+        $this->assertJsonStringEqualsJsonString(
+            <<<JSON
+                {
+                  "userId": 150
                 }
                 JSON,
             $response->content(),

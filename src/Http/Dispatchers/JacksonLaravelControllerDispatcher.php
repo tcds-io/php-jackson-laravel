@@ -24,7 +24,12 @@ class JacksonLaravelControllerDispatcher extends ControllerDispatcher
     public function dispatch(Route $route, $controller, $method)
     {
         $function = new ReflectionClass($controller::class)->getMethod($method);
+        $parameters = $this->resolveClassMethodDependencies(
+            $this->dispatcher->seedParameters($function, $route->parametersWithoutNulls()),
+            $controller,
+            $method,
+        );
 
-        return $this->dispatcher->dispatch($function, $controller->$method(...));
+        return $this->dispatcher->dispatch($function, $controller->$method(...), $parameters);
     }
 }
