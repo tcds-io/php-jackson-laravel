@@ -41,5 +41,7 @@ Route::post('/controller/resource', [FooBarController::class, 'resource']);
 Route::post('/controller/invoices', [FooBarController::class, 'invoices']);
 Route::post('/controller/greet', [FooBarController::class, 'greet']);
 Route::post('/controller/greet-response', [FooBarController::class, 'greetResponse']);
-Route::post('/controller/nullable', [FooBarController::class, 'nullable']);
+Route::post('/controller/defaulted', [FooBarController::class, 'defaulted']);
+Route::post('/controller/missing-nullable', [FooBarController::class, 'missingNullable']);
+Route::post('/controller/service', [FooBarController::class, 'service']);
 Route::post('/controller/{id}', [FooBarController::class, 'read']);

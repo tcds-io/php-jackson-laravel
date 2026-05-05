@@ -15,9 +15,7 @@ use Tcds\Io\Jackson\Laravel\Attributes\JacksonInject;
 use Tcds\Io\Jackson\Laravel\Attributes\JacksonResponse;
 use Tcds\Io\Jackson\Laravel\Http\Dispatchers\JacksonLaravelResponseWrapper;
 use Tcds\Io\Jackson\Laravel\JacksonConfig;
-use Tcds\Io\Jackson\Laravel\JacksonLaravelException;
 use Tcds\Io\Jackson\ObjectMapper;
-use Throwable;
 
 class JacksonLaravelRequestDispatcher
 {
@@ -52,56 +50,51 @@ class JacksonLaravelRequestDispatcher
         private readonly JacksonConfig $config,
     ) {}
 
-    public function dispatch(ReflectionMethod|ReflectionFunction $function, callable $callable): mixed
+    /**
+     * @param array<array-key, mixed> $parameters
+     */
+    public function dispatch(ReflectionMethod|ReflectionFunction $function, callable $callable, array $parameters): mixed
     {
         $returnType = $function->getReturnType()->getName();
-        $params = $function->getParameters();
-        $resolved = $this->resolveParams($params);
         $jacksonResponse = ($function->getAttributes(JacksonResponse::class)[0] ?? null)?->newInstance();
 
-        $response = call_user_func($callable, ...$resolved);
+        $response = call_user_func($callable, ...array_values($parameters));
 
         return $this->wrapper->respond($response, $returnType, $jacksonResponse);
     }
 
     /**
-     * @param list<ReflectionFunctionParameter|ReflectionMethodParameter> $params
+     * @param array<array-key, mixed> $routeParameters
      * @return array<string, mixed>
      */
-    private function resolveParams(array $params): array
+    public function seedParameters(ReflectionMethod|ReflectionFunction $function, array $routeParameters): array
     {
-        $resolved = [];
-        foreach ($params as $param) {
-            $resolved += $this->resolveParamValue($param);
+        $parameters = [];
+
+        foreach ($function->getParameters() as $param) {
+            if ($this->shouldResolveWithJackson($param)) {
+                $parameters[$param->name] = $this->parseSerializableType(
+                    name: $param->name,
+                    type: $param->getType()->getName(),
+                );
+
+                continue;
+            }
+
+            if (array_key_exists($param->name, $routeParameters)) {
+                $parameters[$param->name] = $routeParameters[$param->name];
+            }
         }
 
-        return $resolved;
+        return $parameters;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function resolveParamValue(ReflectionFunctionParameter|ReflectionMethodParameter $param): array
+    private function shouldResolveWithJackson(ReflectionFunctionParameter|ReflectionMethodParameter $param): bool
     {
-        if ($param->isVariadic()) {
-            /** @var array<string, mixed> $routeParams */
-            $routeParams = $this->request->route()->parameters ?? [];
-
-            return [$param->name => $routeParams];
-        }
-
-        $name = $param->name;
         $type = $param->getType()->getName();
-        $hasInject = $param->getAttributes(JacksonInject::class) !== [];
 
-        $value = match (true) {
-            $hasInject => $this->parseSerializableType($name, $type),
-            $this->config->readable($type) => $this->parseSerializableType($name, $type),
-            array_key_exists($name, $this->data) => $this->data[$name],
-            default => $this->make($type, $name),
-        };
-
-        return [$name => $value];
+        return $param->getAttributes(JacksonInject::class) !== []
+            || $this->config->readable($type);
     }
 
     /**
@@ -168,12 +161,4 @@ class JacksonLaravelRequestDispatcher
         return $objectData;
     }
 
-    private function make(string $type, string $name): mixed
-    {
-        try {
-            return $this->container->make($type);
-        } catch (Throwable $e) {
-            throw new JacksonLaravelException("Cannot resolve `$type \$$name` from request", previous: $e);
-        }
-    }
 }
