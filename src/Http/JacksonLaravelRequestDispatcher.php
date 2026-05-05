@@ -38,6 +38,7 @@ class JacksonLaravelRequestDispatcher
                 $this->config->getCustomParams(container: $this->container, mapper: $this->mapper),
                 $this->request->query->all(),
                 $this->request->request->all(),
+                $this->objectBodyData(),
                 $routeParams,
             );
         }
@@ -130,9 +131,41 @@ class JacksonLaravelRequestDispatcher
         return $isList
             // when desired type is list, then grab only payload because
             // query and path params will mess up with the list payload
-            ? $this->request->request->all()
+            ? $this->bodyData()
             // return the whole request merged into a single array
             : $this->data;
+    }
+
+    /**
+     * @return array<string, mixed>|list<mixed>
+     */
+    private function bodyData(): array
+    {
+        /** @var array<string, mixed>|list<mixed> */
+        return $this->request->isJson()
+            ? $this->request->json()->all()
+            : $this->request->request->all();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function objectBodyData(): array
+    {
+        $data = $this->bodyData();
+
+        if (array_is_list($data)) {
+            return [];
+        }
+
+        $objectData = [];
+        foreach ($data as $key => $value) {
+            if (is_string($key)) {
+                $objectData[$key] = $value;
+            }
+        }
+
+        return $objectData;
     }
 
     private function make(string $type, string $name): mixed
