@@ -9,7 +9,7 @@ This package lets you:
 - Inject **typed objects** (and collections) directly into controllers and route callables
 - Deserialize from JSON body, query params, form data, and route params
 - Automatically serialize your return values back to JSON using PHP-Jackson
-- Cast models attributes
+- Cast model attributes
 
 ---
 
@@ -19,12 +19,7 @@ This package lets you:
 composer require tcds-io/php-jackson-laravel
 ```
 
-Then create the configuration file:
-```bash
-php artisan vendor:publish --tag=jackson # creates jackson/config.php
-```
-
-Laravel auto‑discovers the service provider. No manual configuration needed unless you disabled discovery:
+Laravel auto‑discovers the service provider. No configuration file is needed for the attribute-based setup. If you disabled package discovery, add the provider manually:
 
 ### Manually adding the service provider
 ```php
@@ -38,30 +33,37 @@ Laravel auto‑discovers the service provider. No manual configuration needed un
 
 ## ⚙️ How it works
 
-1. The plugin inspects your **method parameter types** and **PHPDoc generics**.
-2. It builds those objects from:
+1. Mark request DTO parameters with `#[JacksonInject]`.
+2. Mark return values that should be serialized with `#[JacksonResponse]`, or return `jackson($value)` when response metadata belongs in the method body.
+3. The plugin inspects your **method parameter types** and **PHPDoc generics**.
+4. It builds those objects from:
     - Route params (`{id}`)
     - Query / form data
     - JSON body
-3. Your return value is serialized automatically using PHP‑Jackson.
+5. Your return value is serialized using PHP‑Jackson.
 
 ---
 
 ## 🧩 Controller-based injection & response
 
 ```php
+use Tcds\Io\Jackson\Laravel\Attributes\JacksonInject;
+use Tcds\Io\Jackson\Laravel\Attributes\JacksonResponse;
+
 class FooBarController
 {
     /**
      * @param list<Foo> $items
      * @return list<Foo>
      */
-    public function list(array $items): array
+    #[JacksonResponse]
+    public function list(#[JacksonInject] array $items): array
     {
         return $items;
     }
 
-    public function read(int $id, Foo $foo): Foo
+    #[JacksonResponse]
+    public function read(int $id, #[JacksonInject] Foo $foo): Foo
     {
         return new Foo(
             id: $id,
@@ -86,13 +88,17 @@ Route::post('/resource/{id}', [FooBarController::class, 'read']);
 
 ```php
 use Illuminate\Support\Facades\Route;
+use Tcds\Io\Jackson\Laravel\Attributes\JacksonInject;
+use Tcds\Io\Jackson\Laravel\Attributes\JacksonResponse;
 
 Route::get('/callable/resource/{id}',
+    #[JacksonResponse]
     fn (int $id) => new Foo(id: $id, a: "aaa", b: "get", type: Type::AAA)
 );
 
 Route::post('/callable/resource',
-    fn (Foo $foo) => $foo
+    #[JacksonResponse]
+    fn (#[JacksonInject] Foo $foo) => $foo
 );
 
 Route::post('/callable',
@@ -100,60 +106,14 @@ Route::post('/callable',
      * @param list<Foo> $items
      * @return list<Foo>
      */
-    fn (array $items): array => $items,
+    #[JacksonResponse]
+    fn (#[JacksonInject] array $items): array => $items,
 );
 ```
 
 ---
 
-## 🛠 Configuring Serializable Objects
-
-To enable automatic request → object → response mapping, register your serializable classes in:
-
-```
-jackson/config.php
-```
-
-### Example configuration
-
-```php
-return [
-    'mappers' => [
-        // Simple automatic serialization
-        Address::class => [],
-    
-        // Custom readers and writers
-        Foo::class => [
-            'reader' => fn(array $data) => new Foo($data['a'], $data['b']),
-            'writer' => fn(Foo $foo) => ['a' => $foo->a, 'b' => $foo->b],
-        ],
-    
-        // Use Laravel's Auth system to inject the authenticated user
-        User::class => [
-            'reader' => fn () => Auth::user(),
-    
-            // Optional: control what is exposed in API responses
-            'writer' => fn (User $user) => [
-                'id' => $user->id,
-                'name' => $user->name,
-                // 'email' => $user->email, // exclude sensitive fields
-            ],
-        ],
-    ],
-];
-```
-
-### How this behaves
-
-- Any controller or callable that includes `User $user` will automatically receive `Auth::user()`.
-- Responses containing a `User` instance will use your custom `writer` output.
-- Unregistered classes cannot be serialized or deserialized (security-by-default).
-
----
-
-## 🏷 Attribute-based injection & response
-
-Instead of registering a type globally in `mappers`, you can opt in per parameter or per method using attributes. The attribute always wins over the global config.
+## 🏷 Response status and headers
 
 ```php
 use Tcds\Io\Jackson\Laravel\Attributes\JacksonInject;
@@ -200,9 +160,69 @@ class GreetController
 
 ---
 
-## 🧪 Error handling
+## 🛠 Extending Jackson configuration
 
-If parsing fails, php-jackson-laravel converts a php-jackson `UnableToParseValue` exception into a `400 Bad Request` HTTP response by default:
+The attribute-based API is the default path for request and response mapping, but the package also has a central configuration file for application-wide behavior. Use it to add global serialization rules, customize request parsing errors, and inject custom params into mapped objects.
+
+### Publish config
+
+Publish the configuration file when you need global mappers, error handlers, custom params, or model casts:
+
+```bash
+php artisan vendor:publish --tag=jackson # creates jackson/config.php
+```
+
+### Add global mappers
+
+Global mappers tell Jackson to always handle a type in requests and responses without adding attributes to every controller method or route closure. They are useful when a DTO is part of your app-wide API contract, or when you want to define custom read/write behavior once instead of repeating it at each endpoint.
+
+```php
+return [
+    'mappers' => [
+        // Simple automatic request and response mapping
+        Address::class => [],
+
+        // Custom readers and writers
+        Foo::class => [
+            'reader' => fn(array $data) => new Foo($data['a'], $data['b']),
+            'writer' => fn(Foo $foo) => ['a' => $foo->a, 'b' => $foo->b],
+        ],
+
+        // Use Laravel services to inject values that do not come from the request
+        User::class => [
+            'reader' => fn () => Auth::user(),
+            'writer' => fn (User $user) => [
+                'id' => $user->id,
+                'name' => $user->name,
+                // 'email' => $user->email, // exclude sensitive fields
+            ],
+        ],
+    ],
+];
+```
+
+With a configured mapper, Jackson can read and write that type without `#[JacksonInject]` or `#[JacksonResponse]`:
+
+```php
+class FooBarController
+{
+    public function read(int $id, Foo $foo): Foo
+    {
+        return new Foo(
+            id: $id,
+            a: $foo->a,
+            b: $foo->b,
+            type: $foo->type,
+        );
+    }
+}
+```
+
+Responses serialized this way use status `200` and do not support custom headers. Use `#[JacksonResponse]` or `jackson($value)` when an endpoint needs a different status code or response headers.
+
+### Customizing the error handler
+
+If parsing fails, php-jackson-laravel converts a php-jackson `UnableToParseValue` exception into a `400 Bad Request` response by default:
 
 ```json
 {
@@ -212,10 +232,7 @@ If parsing fails, php-jackson-laravel converts a php-jackson `UnableToParseValue
 }
 ```
 
-### Customizing the error handler
-
-You can replace the default error response by setting `errors.request` in `jackson/config.php`. The handler receives an `UnableToParseValue` exception and must return a `Throwable` (typically an `HttpResponseException`).
-This can be changed to handle it any way you like. The below example mimics the default library behaviour:
+Set `errors.request` when your API needs a different response shape or status code. The handler receives an `UnableToParseValue` exception and must return a `Throwable`, typically an `HttpResponseException`.
 
 ```php
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -241,12 +258,37 @@ The `UnableToParseValue` exception exposes:
 - `$e->expected` — list of accepted values or types
 - `$e->given` — the type or value that was received
 
----
+### Inject custom params
 
-## 🪄 Casts
-Model attributes can also be cast using Jackson, all configured classes automatically become castable in models:
-- Add the class to the mappers in `jackson/config.php`
-- Setup attribute casting
+Custom params let you add request-scoped values that do not come from the URL, query string, form data, or JSON body. This is useful for authenticated user IDs, tenant IDs, locale, feature flags, or any value you want available while Jackson builds a request object.
+
+```php
+use App\Services\AuthTokenService;
+use Psr\Container\ContainerInterface;
+
+return [
+    'params' => fn(ContainerInterface $container) => [
+        'userId' => $container->get(AuthTokenService::class)->userId(),
+    ],
+    // ...
+];
+```
+
+Those values are merged into the data used to build Jackson objects, so a DTO can receive them like any other constructor field:
+
+```php
+readonly class InvoiceQuery
+{
+    public function __construct(
+        public int $userId,
+        public ?string $customer = null,
+    ) {}
+}
+```
+
+### Model casts
+
+Configured classes automatically become castable in Eloquent models:
 
 ```php
 class User extends Model
@@ -270,7 +312,7 @@ class User extends Model
 
 ```bash
 composer install
-composer tests       # runs cs:check + phpstan + phpunit
+composer tests       # runs cs:check + phpstan
 composer cs:fix      # auto-fix code style
 ```
 
