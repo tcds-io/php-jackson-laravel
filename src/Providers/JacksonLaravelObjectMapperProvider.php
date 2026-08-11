@@ -49,8 +49,12 @@ class JacksonLaravelObjectMapperProvider extends ServiceProvider
         $this->app->singleton(JsonObjectMapper::class, fn() => $jsonMapper);
         $this->app->singleton(ObjectMapper::class, fn() => $arrayMapper);
 
-        $this->app->singleton(CallableDispatcher::class, JacksonLaravelCallableDispatcher::class);
-        $this->app->singleton(ControllerDispatcher::class, JacksonLaravelControllerDispatcher::class);
+        // scoped, not singleton: these hold the JacksonLaravelRequestDispatcher, which
+        // carries the current Request and its merged request data. Scoped instances are
+        // flushed between requests on long-running runtimes (Octane), so the chain is
+        // rebuilt against the fresh Request instead of leaking the first request's data.
+        $this->app->scoped(CallableDispatcher::class, JacksonLaravelCallableDispatcher::class);
+        $this->app->scoped(ControllerDispatcher::class, JacksonLaravelControllerDispatcher::class);
 
         $this->app->singleton(JacksonLaravelResponseWrapper::class, fn() => new JacksonLaravelResponseWrapper(
             mapper: $this->app->get(ObjectMapper::class),
